@@ -45,6 +45,33 @@
       "compilerOptions": {
         "tsConfigPath": "libs/common/tsconfig.lib.json"
       }
+    },
+    "auth": {
+      "type": "application",
+      "root": "apps/auth",
+      "entryFile": "main",
+      "sourceRoot": "apps/auth/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/auth/tsconfig.app.json"
+      }
+    },
+    "gateway": {
+      "type": "application",
+      "root": "apps/gateway",
+      "entryFile": "main",
+      "sourceRoot": "apps/gateway/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/gateway/tsconfig.app.json"
+      }
+    },
+    "tenant": {
+      "type": "application",
+      "root": "apps/tenant",
+      "entryFile": "main",
+      "sourceRoot": "apps/tenant/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/tenant/tsconfig.app.json"
+      }
     }
   }
 }

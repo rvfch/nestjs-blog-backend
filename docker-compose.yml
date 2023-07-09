@@ -1,0 +1,113 @@
+services:
+  cache:
+    image: redis:latest
+    restart: always
+    ports:
+      - '6379:6379'
+    command: redis-server --save 20 1 --loglevel warning
+    volumes:
+      - cache:/data
+
+  db:
+    image: 'bitnami/postgresql:latest'
+    restart: always
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=blog
+    ports:
+      - '5432:5432'
+    volumes:
+      - db:/var/lib/postgresql/data
+
+  auth:
+    build:
+      context: .
+      dockerfile: ./apps/auth/Dockerfile
+      target: development
+    command: npm run start:dev auth
+    env_file:
+      - ./apps/auth/.env
+    depends_on:
+      - cache
+      - db
+    volumes:
+      - .:/usr/src/app
+      - /usr/src/app/node_modules
+    ports:
+      - '3004:3004'
+
+
+  blog:
+    build:
+      context: .
+      dockerfile: ./apps/blog/Dockerfile
+      target: development
+    command: npm run start:dev blog
+    env_file:
+      - ./apps/blog/.env
+    depends_on:
+      - cache
+      - db
+    volumes:
+      - .:/usr/src/app
+      - /usr/src/app/node_modules
+    ports:
+      - '3001:3001'
+
+  # image-manager:
+  #   build:
+  #     context: .
+  #     dockerfile: ./apps/image-manager/Dockerfile
+  #     target: development
+  #   command: npm run start:dev image-manager
+  #   env_file:
+  #     - ./apps/image-manager/.env
+  #   depends_on:
+  #     - cache
+  #     - db
+  #   volumes:
+  #     - .:/usr/src/app
+  #     - /usr/src/app/node_modules
+  #   ports:
+  #     - '3002:3002'
+
+  users:
+    build:
+      context: .
+      dockerfile: ./apps/users/Dockerfile
+      target: development
+    command: npm run start:dev users
+    env_file:
+      - ./apps/users/.env
+    depends_on:
+      - cache
+      - db
+    volumes:
+      - .:/usr/src/app
+      - /usr/src/app/node_modules
+    ports:
+      - '3003:3003'
+
+  tenant:
+    build:
+      context: .
+      dockerfile: ./apps/tenant/Dockerfile
+      target: development
+    command: npm run start:dev tenant
+    env_file:
+      - ./apps/tenant/.env
+    depends_on:
+      - cache
+      - db
+    volumes:
+      - .:/usr/src/app
+      - /usr/src/app/node_modules
+    ports:
+      - '3100:3100'
+
+volumes:
+  cache:
+    driver: local
+  db:
+    driver: local
