@@ -1,6 +1,6 @@
 {
   "name": "backend",
-  "version": "1.0.0-DEV",
+  "version": "2.0.0-DEV",
   "description": "Blog Engine",
   "author": "Roman Filatov",
   "private": true,
