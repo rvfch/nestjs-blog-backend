@@ -1,15 +1,12 @@
-import {
-  BelongsTo,
-  Column,
-  DataType,
-  ForeignKey,
-  Model,
-  Table,
-} from 'sequelize-typescript';
-import { User } from './user.model';
-
-@Table({ schema: 'public' })
-export class Tenant extends Model<Tenant> {
+import { Column, DataType, Is, IsUUID, Table } from 'sequelize-typescript';
+import { ITenant } from './interface/tenant.interface';
+import { ARGON2_HASH } from '../constants/regex.constants';
+import { BaseModel } from './base.model';
+@Table({
+  freezeTableName: true,
+})
+export class Tenant extends BaseModel<Tenant> implements ITenant {
+  @IsUUID(4)
   @Column({
     type: DataType.STRING,
     primaryKey: true,
@@ -19,16 +16,15 @@ export class Tenant extends Model<Tenant> {
 
   @Column({
     type: DataType.STRING,
+    allowNull: false,
+    unique: true,
   })
-  name: string;
+  name!: string;
 
-  // @ForeignKey(() => User)
-  // @Column({
-  //   type: DataType.STRING,
-  //   allowNull: false,
-  // })
-  // userId: string;
-
-  // @BelongsTo(() => User)
-  // user: string;
+  @Is(ARGON2_HASH)
+  @Column({
+    type: DataType.STRING,
+    allowNull: false,
+  })
+  password!: string;
 }

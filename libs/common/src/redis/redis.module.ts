@@ -2,6 +2,7 @@ import { DynamicModule, Module } from '@nestjs/common';
 import { ClientsModule, Transport } from '@nestjs/microservices';
 import { RedisService } from './redis.service';
 import { ConfigService } from '@nestjs/config';
+import { REDIS_HOST, REDIS_PORT } from '../constants/constants';
 
 interface RedisModuleOptions {
   name: string;
@@ -22,8 +23,8 @@ export class RedisModule {
             useFactory: (configService: ConfigService) => ({
               transport: Transport.REDIS,
               options: {
-                host: configService.get<string>('REDIS_HOST'),
-                port: configService.get<number>('REDIST_PORT'),
+                host: configService.get<string>(REDIS_HOST),
+                port: configService.get<number>(REDIS_PORT),
               },
             }),
             inject: [ConfigService],

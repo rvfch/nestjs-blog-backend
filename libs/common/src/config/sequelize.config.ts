@@ -6,7 +6,14 @@ import {
 import { DEVELOPMENT, PRODUCTION } from '../constants/constants';
 import { databaseConfig } from './database.config';
 import { Tenant } from '../entity/tenant.model';
+import { Article } from '../entity/article.model';
+import { Credentials } from '../entity/credentials.model';
 import { User } from '../entity/user.model';
+import { Rating } from '../entity/rating.model';
+import { Comment } from '../entity/comment.model';
+import { ArticleImage } from '../entity/article-image.model';
+import { UserImage } from '../entity/user-image.model';
+import { BlacklistedToken } from '../entity/blacklisted-token.model';
 
 @Injectable()
 export class SequelizeConfig implements SequelizeOptionsFactory {
@@ -25,9 +32,20 @@ export class SequelizeConfig implements SequelizeOptionsFactory {
     }
     return {
       ...config,
-      models: [Tenant, User],
+      // Default models
+      models: [
+        Tenant,
+        Article,
+        Comment,
+        Credentials,
+        User,
+        ArticleImage,
+        UserImage,
+        Rating,
+        BlacklistedToken,
+      ],
+      //  autoLoadModels: true,
       synchronize: true,
-      autoLoadModels: true,
     };
   }
 }

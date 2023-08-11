@@ -5,37 +5,36 @@ import {
   ForeignKey,
   HasMany,
   HasOne,
-  Model,
+  IsUUID,
   Table,
 } from 'sequelize-typescript';
-import { Tenant } from './tenant.model';
 import { ArticleStatus } from './enums/articlestatus.enum';
 import { Comment } from './comment.model';
-import { Image } from './image.model';
+import { ArticleImage } from './article-image.model';
+import { IArticle } from './interface/article.interface';
+import { IComment } from './interface/comment.interface';
+import { IImage } from './interface/image.interface';
+import { BaseModel } from './base.model';
+import { User } from './user.model';
+import { ObjectType } from '@nestjs/graphql';
 
-@Table
-export class Article extends Model<Article> {
+@ObjectType()
+@Table({
+  freezeTableName: true,
+})
+export class Article extends BaseModel<Article> implements IArticle {
+  @IsUUID(4)
   @Column({
     type: DataType.STRING,
     primaryKey: true,
     defaultValue: DataType.UUIDV4,
   })
-  id: string;
-
-  @BelongsTo(() => Tenant)
-  tenant: Tenant;
-
-  @ForeignKey(() => Tenant)
-  @Column({
-    type: DataType.STRING,
-    allowNull: false,
-  })
-  blogId: string;
+  id!: string;
 
   @Column({
     type: DataType.STRING,
   })
-  title: string;
+  title!: string;
 
   @Column({
     type: DataType.STRING,
@@ -48,14 +47,28 @@ export class Article extends Model<Article> {
   content: string;
 
   @Column({
-    type: DataType.ENUM(ArticleStatus.PUBLUSHED, ArticleStatus.DRAFT),
+    type: DataType.ENUM(ArticleStatus.PUBLISHED, ArticleStatus.DRAFT),
+    allowNull: false,
+    defaultValue: ArticleStatus.DRAFT,
+  })
+  status!: ArticleStatus;
+
+  @HasMany(() => Comment, { onDelete: 'CASCADE' })
+  comments?: IComment[];
+
+  @HasOne(() => ArticleImage, {
+    onDelete: 'CASCADE',
+  })
+  image?: IImage;
+
+  @BelongsTo(() => User)
+  user!: User;
+
+  @ForeignKey(() => User)
+  @IsUUID(4)
+  @Column({
+    type: DataType.STRING,
     allowNull: false,
   })
-  status: ArticleStatus;
-
-  @HasMany(() => Comment, 'articleId')
-  comments: Comment[];
-
-  @HasOne(() => Image)
-  image: Image;
+  author: string;
 }

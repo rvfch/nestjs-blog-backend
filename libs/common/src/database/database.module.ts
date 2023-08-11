@@ -2,7 +2,7 @@ import { Module } from '@nestjs/common';
 import { SequelizeModule } from '@nestjs/sequelize';
 
 import { ConfigModule } from '@nestjs/config';
-import { SequelizeConfig } from './sequelize.config';
+import { SequelizeConfig } from '../config/sequelize.config';
 
 @Module({
   imports: [

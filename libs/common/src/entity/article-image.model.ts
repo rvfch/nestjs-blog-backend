@@ -3,13 +3,21 @@ import {
   Column,
   DataType,
   ForeignKey,
+  IsUUID,
+  IsUrl,
   Model,
   Table,
 } from 'sequelize-typescript';
 import { Article } from './article.model';
+import { IImage } from './interface/image.interface';
+import { IArticle } from './interface/article.interface';
+import { BaseModel } from './base.model';
 
-@Table
-export class Image extends Model<Image> {
+@Table({
+  freezeTableName: true,
+})
+export class ArticleImage extends BaseModel<ArticleImage> implements IImage {
+  @IsUUID(4)
   @Column({
     type: DataType.STRING,
     primaryKey: true,
@@ -20,15 +28,16 @@ export class Image extends Model<Image> {
   @Column({
     type: DataType.STRING,
   })
-  url: string;
+  url!: string;
 
   @BelongsTo(() => Article)
-  article: Article;
+  article!: IArticle;
 
+  @IsUUID(4)
   @ForeignKey(() => Article)
   @Column({
     type: DataType.STRING,
     allowNull: false,
   })
-  articleId: string;
+  articleId!: string;
 }
