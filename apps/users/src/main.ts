@@ -1,25 +1,30 @@
 import { NestFactory } from '@nestjs/core';
 import { UsersModule } from './users.module';
-import { RedisService } from '@app/common';
-import { MicroserviceOptions } from '@nestjs/microservices';
+import { MicroserviceOptions, Transport } from '@nestjs/microservices';
 import { ValidationPipe } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import * as Constants from '@app/common/constants/constants';
+import { AllExceptionsFilter } from '@app/common/core/exceptions/exception.filter';
 
 async function bootstrap() {
-  const app = await NestFactory.create(UsersModule);
-  // Load configuration
-  const configService = app.get(ConfigService);
-  const APP_PORT = configService.get(Constants.PORT);
-  const APP_NAME = configService.get(Constants.APP_NAME);
-  // Setup Redis as transport layer
-  const redisService = app.get<RedisService>(RedisService);
-  app.connectMicroservice<MicroserviceOptions>(redisService.getOptions());
-  app.useGlobalPipes(new ValidationPipe());
-  await app.startAllMicroservices();
-  // Listen requests
-  await app.listen(APP_PORT, () =>
-    console.log(`[${APP_NAME}] App running on port ${APP_PORT}`),
+  const appContext = await NestFactory.createApplicationContext(UsersModule);
+  const configService = appContext.get(ConfigService);
+
+  const redisHost = configService.get<string>('redis.host');
+  const redisPort = configService.get<number>('redis.port');
+
+  // Setup redis microservice
+  const app = await NestFactory.createMicroservice<MicroserviceOptions>(
+    UsersModule,
+    {
+      transport: Transport.REDIS,
+      options: {
+        host: redisHost,
+        port: redisPort,
+      },
+    },
   );
+  app.useGlobalPipes(new ValidationPipe({ transform: true }));
+  app.useGlobalFilters(new AllExceptionsFilter());
+  await app.listen();
 }
 bootstrap();
