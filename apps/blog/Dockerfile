@@ -1,6 +1,7 @@
 FROM node:alpine as development
 WORKDIR /usr/src/app
 COPY package*.json ./
+RUN npm i -g sequelize-cli
 RUN npm install
 COPY . .
 RUN npm run build
@@ -16,4 +17,5 @@ COPY . .
 COPY --from=development /usr/src/app/dist ./dist
 
 EXPOSE 3001
+
 CMD ["node", "dist/apps/blog/main"]

@@ -1,12 +1,11 @@
+import { Public } from '@app/common/core/decorators/public.decorator';
 import { Controller, Get } from '@nestjs/common';
-import { BlogService } from './blog.service';
 
 @Controller()
 export class BlogController {
-  constructor(private readonly blogService: BlogService) {}
-
-  @Get()
-  getHello(): string {
-    return this.blogService.getHello();
+  @Public()
+  @Get('/ping')
+  ping() {
+    return 'pong';
   }
 }
