@@ -1,16 +1,15 @@
 services:
-  cache:
-    image: redis:latest
+  redis-server:
+    image: redis
     restart: always
     ports:
       - '6379:6379'
-    command: redis-server --save 20 1 --loglevel warning
     volumes:
       - cache:/data
 
   db:
-    image: 'bitnami/postgresql:latest'
-    restart: always
+    image: 'bitnami/postgresql'
+    restart: unless-stopped
     environment:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres
@@ -29,7 +28,7 @@ services:
     env_file:
       - ./apps/auth/.env
     depends_on:
-      - cache
+      - redis-server
       - db
     volumes:
       - .:/usr/src/app
@@ -37,6 +36,32 @@ services:
     ports:
       - '3004:3004'
 
+  gateway:
+    build:
+      context: .
+      dockerfile: ./apps/gateway/Dockerfile
+      target: development
+    command: npm run start:dev gateway
+    env_file:
+      - ./apps/gateway/.env
+    environment:
+      - GATEWAY_URL=http://gateway:8080
+      - AUTH_SERVICE_URL=http://auth:3004
+      - TENANT_SERVICE_URL=http://tenant:3100
+      - BLOG_SERVICE_URL=http://blog:3001
+      - FILE_MANAGER_URL=http://file-manager:2999
+      - USERS_SERVICE_URL=http://users:3003
+    depends_on:
+      - redis-server
+      - db
+      - auth
+      - tenant
+      - blog
+    volumes:
+      - .:/usr/src/app
+      - /usr/src/app/node_modules
+    ports:
+      - '8080:8080'
 
   blog:
     build:
@@ -47,30 +72,33 @@ services:
     env_file:
       - ./apps/blog/.env
     depends_on:
-      - cache
       - db
+      - redis-server
+      - tenant
+      - users
     volumes:
       - .:/usr/src/app
       - /usr/src/app/node_modules
     ports:
       - '3001:3001'
 
-  # image-manager:
-  #   build:
-  #     context: .
-  #     dockerfile: ./apps/image-manager/Dockerfile
-  #     target: development
-  #   command: npm run start:dev image-manager
-  #   env_file:
-  #     - ./apps/image-manager/.env
-  #   depends_on:
-  #     - cache
-  #     - db
-  #   volumes:
-  #     - .:/usr/src/app
-  #     - /usr/src/app/node_modules
-  #   ports:
-  #     - '3002:3002'
+  file-manager:
+    build:
+      context: .
+      dockerfile: ./apps/file-manager/Dockerfile
+      target: development
+    command: npm run start:dev file-manager
+    env_file:
+      - ./apps/file-manager/.env
+    depends_on:
+      - redis-server
+      - db
+    volumes:
+      - .:/usr/src/app
+      - /node_modules
+      - ./public/images:/usr/src/app/public/images
+    ports:
+      - '2999:2999'
 
   users:
     build:
@@ -81,7 +109,7 @@ services:
     env_file:
       - ./apps/users/.env
     depends_on:
-      - cache
+      - redis-server
       - db
     volumes:
       - .:/usr/src/app
@@ -98,7 +126,7 @@ services:
     env_file:
       - ./apps/tenant/.env
     depends_on:
-      - cache
+      - redis-server
       - db
     volumes:
       - .:/usr/src/app
@@ -107,7 +135,6 @@ services:
       - '3100:3100'
 
 volumes:
-  cache:
-    driver: local
+  cache: {}
   db:
     driver: local

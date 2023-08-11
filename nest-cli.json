@@ -28,22 +28,17 @@
         "tsConfigPath": "apps/users/tsconfig.app.json"
       }
     },
-    "image-manager": {
-      "type": "application",
-      "root": "apps/image-manager",
-      "entryFile": "main",
-      "sourceRoot": "apps/image-manager/src",
-      "compilerOptions": {
-        "tsConfigPath": "apps/image-manager/tsconfig.app.json"
-      }
-    },
     "common": {
       "type": "library",
       "root": "libs/common",
       "entryFile": "index",
       "sourceRoot": "libs/common/src",
       "compilerOptions": {
-        "tsConfigPath": "libs/common/tsconfig.lib.json"
+        "tsConfigPath": "libs/common/tsconfig.lib.json",
+        "assets": [
+          "libs/common/src/config/templates/**/*"
+        ],
+        "watchAssets": true
       }
     },
     "auth": {
@@ -71,6 +66,15 @@
       "sourceRoot": "apps/tenant/src",
       "compilerOptions": {
         "tsConfigPath": "apps/tenant/tsconfig.app.json"
+      }
+    },
+    "file-manager": {
+      "type": "application",
+      "root": "apps/file-manager",
+      "entryFile": "main",
+      "sourceRoot": "apps/file-manager/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/file-manager/tsconfig.app.json"
       }
     }
   }
