@@ -1,6 +1,4 @@
 import { BaseService } from '../services/base.service';
-import { Get } from '@nestjs/common';
-import { Public } from '../decorators/public.decorator';
 
 export abstract class BaseController {
   constructor(protected readonly service: BaseService) {}

@@ -1,5 +1,5 @@
 import { IComment } from '@app/common/entity/interface/comment.interface';
-import { InputType, Field } from '@nestjs/graphql';
+import { Field, InputType } from '@nestjs/graphql';
 
 @InputType()
 export class CreateCommentDto implements Partial<IComment> {

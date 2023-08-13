@@ -1,13 +1,13 @@
 import {
+  CallHandler,
+  ExecutionContext,
   Injectable,
   NestInterceptor,
-  ExecutionContext,
-  CallHandler,
 } from '@nestjs/common';
+import { RpcException } from '@nestjs/microservices';
 import { Observable, from } from 'rxjs';
 import { switchMap } from 'rxjs/operators';
 import { TenantStateService } from '../services/tenant-state.service';
-import { RpcException } from '@nestjs/microservices';
 
 @Injectable()
 export class TenantInterceptor implements NestInterceptor {

@@ -1,11 +1,11 @@
 import { ArticleStatus } from '@app/common/entity/enums/articlestatus.enum';
 import { IArticle } from '@app/common/entity/interface/article.interface';
 import { IUser } from '@app/common/entity/interface/user.interface';
+import { ApiProperty, IntersectionType } from '@nestjs/swagger';
 import { Exclude } from 'class-transformer';
 import { IsNumber, IsString, IsUUID } from 'class-validator';
-import { PageDto } from '../../utils/page.dto';
-import { ApiProperty, IntersectionType } from '@nestjs/swagger';
 import { UserDto } from '../../users/user.dto';
+import { PageDto } from '../../utils/page.dto';
 
 export class ArticleDto
   extends IntersectionType(PageDto)

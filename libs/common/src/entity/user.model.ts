@@ -11,17 +11,17 @@ import {
   Min,
   Table,
 } from 'sequelize-typescript';
-import { IUser } from './interface/user.interface';
 import { ARGON2_HASH } from '../constants/regex.constants';
-import { ICredentials } from './interface/credentials.interface';
-import { Credentials } from './credentials.model';
-import { BaseModel } from './base.model';
-import { IBlacklistedToken } from './interface/blacklisted-token.interface';
-import { BlacklistedToken } from './blacklisted-token.model';
-import { UserImage } from './user-image.model';
-import { IImage } from './interface/image.interface';
 import { Article } from './article.model';
+import { BaseModel } from './base.model';
+import { BlacklistedToken } from './blacklisted-token.model';
+import { Credentials } from './credentials.model';
 import { IArticle } from './interface/article.interface';
+import { IBlacklistedToken } from './interface/blacklisted-token.interface';
+import { ICredentials } from './interface/credentials.interface';
+import { IImage } from './interface/image.interface';
+import { IUser } from './interface/user.interface';
+import { UserImage } from './user-image.model';
 
 @Table({
   freezeTableName: true,

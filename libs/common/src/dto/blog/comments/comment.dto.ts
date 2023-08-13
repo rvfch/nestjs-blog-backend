@@ -1,5 +1,5 @@
 import { IComment } from '@app/common/entity/interface/comment.interface';
-import { UserDto } from '../../users/user.dto';
+import { Field, ObjectType } from '@nestjs/graphql';
 import {
   IsNumber,
   IsObject,
@@ -7,8 +7,7 @@ import {
   IsString,
   IsUUID,
 } from 'class-validator';
-import { Field, ObjectType } from '@nestjs/graphql';
-import { User } from '@app/common/entity/user.model';
+import { UserDto } from '../../users/user.dto';
 
 @ObjectType()
 export class CommentDto implements Partial<IComment> {

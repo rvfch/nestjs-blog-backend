@@ -1,3 +1,4 @@
+import { ObjectType } from '@nestjs/graphql';
 import {
   BelongsTo,
   Column,
@@ -8,15 +9,14 @@ import {
   IsUUID,
   Table,
 } from 'sequelize-typescript';
-import { ArticleStatus } from './enums/articlestatus.enum';
-import { Comment } from './comment.model';
 import { ArticleImage } from './article-image.model';
+import { BaseModel } from './base.model';
+import { Comment } from './comment.model';
+import { ArticleStatus } from './enums/articlestatus.enum';
 import { IArticle } from './interface/article.interface';
 import { IComment } from './interface/comment.interface';
 import { IImage } from './interface/image.interface';
-import { BaseModel } from './base.model';
 import { User } from './user.model';
-import { ObjectType } from '@nestjs/graphql';
 
 @ObjectType()
 @Table({

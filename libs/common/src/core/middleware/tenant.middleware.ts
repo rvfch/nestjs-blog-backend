@@ -3,7 +3,7 @@ import {
   Injectable,
   NestMiddleware,
 } from '@nestjs/common';
-import { Response, NextFunction } from 'express';
+import { NextFunction, Response } from 'express';
 import { RequestWithTenantId } from '../../utils/express/request-with-tenant';
 import { TenantStateService } from '../services/tenant-state.service';
 

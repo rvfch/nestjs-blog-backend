@@ -4,16 +4,16 @@ import {
   SequelizeOptionsFactory,
 } from '@nestjs/sequelize';
 import { DEVELOPMENT, PRODUCTION } from '../constants/constants';
-import { databaseConfig } from './database.config';
-import { Tenant } from '../entity/tenant.model';
-import { Article } from '../entity/article.model';
-import { Credentials } from '../entity/credentials.model';
-import { User } from '../entity/user.model';
-import { Rating } from '../entity/rating.model';
-import { Comment } from '../entity/comment.model';
 import { ArticleImage } from '../entity/article-image.model';
-import { UserImage } from '../entity/user-image.model';
+import { Article } from '../entity/article.model';
 import { BlacklistedToken } from '../entity/blacklisted-token.model';
+import { Comment } from '../entity/comment.model';
+import { Credentials } from '../entity/credentials.model';
+import { Rating } from '../entity/rating.model';
+import { Tenant } from '../entity/tenant.model';
+import { UserImage } from '../entity/user-image.model';
+import { User } from '../entity/user.model';
+import { databaseConfig } from './database.config';
 
 @Injectable()
 export class SequelizeConfig implements SequelizeOptionsFactory {

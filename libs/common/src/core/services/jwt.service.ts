@@ -1,7 +1,6 @@
 import { TokenType } from '@app/common/constants/token-type.enum';
-import { BaseService } from '@app/common/core/services/base.service';
-import { IUser } from '@app/common/entity/interface/user.interface';
 import { IJwt } from '@app/common/core/interface/jwt.interface';
+import { IUser } from '@app/common/entity/interface/user.interface';
 import {
   IAccessPayload,
   IAccessToken,
@@ -22,10 +21,8 @@ import {
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import * as jwt from 'jsonwebtoken';
-import { Sequelize } from 'sequelize-typescript';
-import { v4 } from 'uuid';
 import { Algorithm } from 'jsonwebtoken';
-import { TenantStateService } from '@app/common/core/services/tenant-state.service';
+import { v4 } from 'uuid';
 
 @Injectable({ scope: Scope.REQUEST })
 export class JwtService {

@@ -1,3 +1,4 @@
+import { MessageDto } from '@app/common/dto/utils/message.dto';
 import {
   BadRequestException,
   ConflictException,
@@ -8,22 +9,18 @@ import {
   NotFoundException,
   Scope,
 } from '@nestjs/common';
+import { ClientProxy } from '@nestjs/microservices';
+import * as jwt from 'jsonwebtoken';
+import { catchError, firstValueFrom, of } from 'rxjs';
+import { UniqueConstraintError } from 'sequelize';
 import { Model, Sequelize } from 'sequelize-typescript';
-import {
-  POSTGRES_DUPLICATE_ERROR_CODE,
-  POSTGRES_DUPLICATE_ERROR_MESSAGE,
-} from '../../constants/constants';
+import { v4 } from 'uuid';
+import { POSTGRES_DUPLICATE_ERROR_MESSAGE } from '../../constants/constants';
 import { isNull, isUndefined } from '../../helpers/validation.helpers';
 import { IAccessToken } from '../../interface/auth/token/access-token.interface';
-import { IRefreshToken } from '../../interface/auth/token/refresh-token.interface';
 import { IEmailToken } from '../../interface/auth/token/email-token.interface';
-import * as jwt from 'jsonwebtoken';
-import { v4 } from 'uuid';
-import { QueryTypes, UniqueConstraintError } from 'sequelize';
-import { catchError, firstValueFrom, of } from 'rxjs';
-import { ClientProxy } from '@nestjs/microservices';
+import { IRefreshToken } from '../../interface/auth/token/refresh-token.interface';
 import { TenantStateService } from './tenant-state.service';
-import { MessageDto } from '@app/common/dto/utils/message.dto';
 
 /**
  * This is the base class for all service classes

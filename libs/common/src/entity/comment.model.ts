@@ -8,13 +8,13 @@ import {
   Table,
 } from 'sequelize-typescript';
 import { Article } from './article.model';
-import { User } from './user.model';
-import { Rating } from './rating.model';
-import { IComment } from './interface/comment.interface';
-import { IArticle } from './interface/article.interface';
-import { IUser } from './interface/user.interface';
-import { IRating } from './interface/rating.interface';
 import { BaseModel } from './base.model';
+import { IArticle } from './interface/article.interface';
+import { IComment } from './interface/comment.interface';
+import { IRating } from './interface/rating.interface';
+import { IUser } from './interface/user.interface';
+import { Rating } from './rating.model';
+import { User } from './user.model';
 
 @Table({
   freezeTableName: true,

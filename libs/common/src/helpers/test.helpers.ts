@@ -1,8 +1,8 @@
+import { v4 as uuidv4 } from 'uuid';
 import { ArticleDto } from '../dto/blog/article/article.dto';
 import { UserDto } from '../dto/users/user.dto';
 import { ArticleStatus } from '../entity/enums/articlestatus.enum';
 import { RequestWithTenantId } from '../utils/express/request-with-tenant';
-import { v4 as uuidv4 } from 'uuid';
 
 export const generateRandomUUID4 = (): string => {
   return uuidv4();

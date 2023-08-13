@@ -6,13 +6,12 @@ import {
   IsUUID,
   Table,
 } from 'sequelize-typescript';
-import { User } from './user.model';
+import { BaseModel } from './base.model';
 import { Comment } from './comment.model';
+import { IComment } from './interface/comment.interface';
 import { IRating } from './interface/rating.interface';
 import { IUser } from './interface/user.interface';
-import { IComment } from './interface/comment.interface';
-import { BaseModel } from './base.model';
-import { ObjectType } from '@nestjs/graphql';
+import { User } from './user.model';
 
 @Table({
   freezeTableName: true,

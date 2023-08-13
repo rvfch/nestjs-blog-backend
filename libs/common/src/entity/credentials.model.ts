@@ -1,3 +1,4 @@
+import dayjs from 'dayjs';
 import {
   BelongsTo,
   Column,
@@ -7,11 +8,10 @@ import {
   IsUUID,
   Table,
 } from 'sequelize-typescript';
-import { ICredentials } from './interface/credentials.interface';
 import { ARGON2_HASH } from '../constants/regex.constants';
-import dayjs from 'dayjs';
-import { User } from './user.model';
 import { BaseModel } from './base.model';
+import { ICredentials } from './interface/credentials.interface';
+import { User } from './user.model';
 
 @Table({
   freezeTableName: true,

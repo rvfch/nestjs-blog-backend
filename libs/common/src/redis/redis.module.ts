@@ -1,8 +1,8 @@
 import { DynamicModule, Module } from '@nestjs/common';
-import { ClientsModule, Transport } from '@nestjs/microservices';
-import { RedisService } from './redis.service';
 import { ConfigService } from '@nestjs/config';
+import { ClientsModule, Transport } from '@nestjs/microservices';
 import { REDIS_HOST, REDIS_PORT } from '../constants/constants';
+import { RedisService } from './redis.service';
 
 interface RedisModuleOptions {
   name: string;

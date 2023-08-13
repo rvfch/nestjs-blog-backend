@@ -1,20 +1,19 @@
+import { IAccessToken } from '@app/common/interface/auth/token/access-token.interface';
 import {
   CanActivate,
   ExecutionContext,
   Injectable,
-  Scope,
   UnauthorizedException,
 } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { Reflector } from '@nestjs/core';
+import { GqlExecutionContext } from '@nestjs/graphql';
 import { isJWT } from 'class-validator';
 import { Request } from 'express';
-import { IS_PUBLIC_KEY } from '../decorators/public.decorator';
-import { isNull, isUndefined } from '../../helpers/validation.helpers';
 import { TokenType } from '../../constants/token-type.enum';
+import { isNull, isUndefined } from '../../helpers/validation.helpers';
+import { IS_PUBLIC_KEY } from '../decorators/public.decorator';
 import { JwtService } from '../services/jwt.service';
-import { IAccessToken } from '@app/common/interface/auth/token/access-token.interface';
-import { GqlExecutionContext } from '@nestjs/graphql';
-import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class AuthGqlGuard implements CanActivate {

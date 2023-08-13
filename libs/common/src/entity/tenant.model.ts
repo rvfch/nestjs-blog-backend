@@ -1,7 +1,7 @@
 import { Column, DataType, Is, IsUUID, Table } from 'sequelize-typescript';
-import { ITenant } from './interface/tenant.interface';
 import { ARGON2_HASH } from '../constants/regex.constants';
 import { BaseModel } from './base.model';
+import { ITenant } from './interface/tenant.interface';
 @Table({
   freezeTableName: true,
 })

@@ -1,7 +1,7 @@
-import { ConfigService } from '@nestjs/config';
-import { RedisOptions, Transport } from '@nestjs/microservices';
 import { REDIS_HOST, REDIS_PORT } from '@app/common/constants/constants';
 import { Injectable } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
+import { RedisOptions, Transport } from '@nestjs/microservices';
 
 @Injectable()
 export class RedisService {

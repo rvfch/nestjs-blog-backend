@@ -1,6 +1,6 @@
-import { IsEmail, IsIP, IsNotEmpty, IsString, Length } from 'class-validator';
-import { PasswordsDto } from './passwords.dto';
 import { ApiProperty } from '@nestjs/swagger';
+import { IsEmail, IsNotEmpty, IsString, Length } from 'class-validator';
+import { PasswordsDto } from './passwords.dto';
 
 export abstract class SignUpDto extends PasswordsDto {
   @ApiProperty()

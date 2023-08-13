@@ -4,14 +4,12 @@ import {
   DataType,
   ForeignKey,
   IsUUID,
-  IsUrl,
-  Model,
   Table,
 } from 'sequelize-typescript';
 import { Article } from './article.model';
-import { IImage } from './interface/image.interface';
-import { IArticle } from './interface/article.interface';
 import { BaseModel } from './base.model';
+import { IArticle } from './interface/article.interface';
+import { IImage } from './interface/image.interface';
 
 @Table({
   freezeTableName: true,

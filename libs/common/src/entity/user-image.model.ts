@@ -7,8 +7,8 @@ import {
   IsUrl,
   Table,
 } from 'sequelize-typescript';
-import { IImage } from './interface/image.interface';
 import { BaseModel } from './base.model';
+import { IImage } from './interface/image.interface';
 import { IUser } from './interface/user.interface';
 import { User } from './user.model';
 

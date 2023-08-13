@@ -1,3 +1,4 @@
+import { IAccessToken } from '@app/common/interface/auth/token/access-token.interface';
 import {
   CanActivate,
   ExecutionContext,
@@ -8,11 +9,10 @@ import {
 import { Reflector } from '@nestjs/core';
 import { isJWT } from 'class-validator';
 import { Request } from 'express';
-import { IS_PUBLIC_KEY } from '../decorators/public.decorator';
-import { isNull, isUndefined } from '../../helpers/validation.helpers';
 import { TokenType } from '../../constants/token-type.enum';
+import { isNull, isUndefined } from '../../helpers/validation.helpers';
+import { IS_PUBLIC_KEY } from '../decorators/public.decorator';
 import { JwtService } from '../services/jwt.service';
-import { IAccessToken } from '@app/common/interface/auth/token/access-token.interface';
 
 @Injectable({ scope: Scope.REQUEST })
 export class AuthGuard implements CanActivate {

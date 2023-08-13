@@ -1,6 +1,6 @@
 import { IArticle } from '@app/common/entity/interface/article.interface';
 import { ApiProperty } from '@nestjs/swagger';
-import { IsOptional, IsString, IsUrl, Length } from 'class-validator';
+import { IsOptional, IsString, Length } from 'class-validator';
 
 export class CreateArticleDto implements Partial<IArticle> {
   @ApiProperty()

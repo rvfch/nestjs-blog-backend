@@ -6,9 +6,9 @@ import {
   IsUUID,
   Table,
 } from 'sequelize-typescript';
+import { BaseModel } from './base.model';
 import { IBlacklistedToken } from './interface/blacklisted-token.interface';
 import { User } from './user.model';
-import { BaseModel } from './base.model';
 
 @Table
 export class BlacklistedToken
