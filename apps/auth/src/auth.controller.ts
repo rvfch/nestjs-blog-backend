@@ -1,3 +1,4 @@
+import { LOAD_TENANT } from '@app/common/constants/constants';
 import { BaseController } from '@app/common/core/controllers/base.controller';
 import { CurrentUser } from '@app/common/core/decorators/current-user.decorator';
 import { Origin } from '@app/common/core/decorators/origin.decorator';
@@ -56,6 +57,7 @@ export class AuthController extends BaseController {
     private readonly configService: ConfigService,
   ) {
     super(authService);
+    // FIXME: change hardcoded values to constants
     this.cookieName = this.configService.get<string>('REFRESH_COOKIE');
     this.refreshTime = this.configService.get<number>('jwt.refresh.time');
     this.debug = this.configService.get<string>('NODE_ENV') !== 'production';
@@ -78,7 +80,6 @@ export class AuthController extends BaseController {
   @Post('/signup')
   public async signUp(
     @Body() dtoIn: SignUpDto,
-    @Req() req: RequestWithTenantId,
     @Origin() origin: string | undefined,
   ): Promise<MessageDto> {
     return await this.authService.signUp(dtoIn, origin);
@@ -96,10 +97,7 @@ export class AuthController extends BaseController {
   @ApiBearerAuth()
   @HttpCode(HttpStatus.OK)
   @Get('/me')
-  public async getMe(
-    @CurrentUser() id: string,
-    @Req() req: RequestWithTenantId,
-  ): Promise<UserDto> {
+  public async getMe(@CurrentUser() id: string): Promise<UserDto> {
     return await this.authService.getMe(id);
   }
 
@@ -209,9 +207,7 @@ export class AuthController extends BaseController {
   @Public()
   @Post('/initTenant')
   @HttpCode(HttpStatus.OK)
-  public async initTenant(
-    @Req() req: RequestWithTenantId,
-  ): Promise<TenantAuthorizedDto> {
+  public async initTenant(): Promise<TenantAuthorizedDto> {
     return await this.authService.initTenant();
   }
 
@@ -232,7 +228,7 @@ export class AuthController extends BaseController {
   ): Promise<TenantAuthorizedDto> {
     return await this.authService.authorizeTenant(
       this.redisClient
-        .send<ITenant, TenantDto>('load_tenant', dtoIn)
+        .send<ITenant, TenantDto>(LOAD_TENANT, dtoIn)
         .pipe(catchError((val) => of({ error: val.message }))),
       dtoIn.password,
     );

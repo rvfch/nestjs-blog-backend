@@ -1,3 +1,4 @@
+import { LOAD_TENANT, VERIFY_TENANT } from '@app/common/constants/constants';
 import { TenantInterceptor } from '@app/common/core/interceptors/tenant.interceptor';
 import { TenantDto } from '@app/common/dto/tenant/tenant.dto';
 import { Controller, UseInterceptors } from '@nestjs/common';
@@ -22,7 +23,7 @@ export class TenantController {
    * @param ctx: RedisContext
    * @return tenant: Promise<Tenant>
    */
-  @MessagePattern('load_tenant')
+  @MessagePattern(LOAD_TENANT)
   public async tenantInit(
     @Payload() dtoIn: TenantDto,
     @Ctx() ctx: RedisContext,
@@ -31,7 +32,7 @@ export class TenantController {
   }
 
   @UseInterceptors(TenantInterceptor)
-  @MessagePattern('verify_tenant')
+  @MessagePattern(VERIFY_TENANT)
   public async getById(@Ctx() ctx: RedisContext): Promise<TenantDto> {
     return await this.tenantService.verifyTenant();
   }

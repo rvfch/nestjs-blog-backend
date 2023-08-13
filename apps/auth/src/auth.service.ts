@@ -1,4 +1,15 @@
-import { INVALID_CREDENTIALS } from '@app/common/constants/errors.constants';
+import {
+  CREATE_USER,
+  GET_USER_BY_CREDENTIALS,
+  GET_USER_BY_EMAIL,
+  GET_USER_BY_ID,
+  VERIFY_TENANT,
+} from '@app/common/constants/constants';
+import {
+  INVALID_CREDENTIALS,
+  INVALID_TOKEN,
+  TENANT_NOT_EXISTS,
+} from '@app/common/constants/errors.constants';
 import { TokenType } from '@app/common/constants/token-type.enum';
 import { BaseService } from '@app/common/core/services/base.service';
 import { JwtService } from '@app/common/core/services/jwt.service';
@@ -31,6 +42,7 @@ import { Cache } from 'cache-manager';
 import dayjs from 'dayjs';
 import { Observable, firstValueFrom } from 'rxjs';
 import { Sequelize } from 'sequelize-typescript';
+import { LOGOUT_SUCCESSFUL, REGISTRATION_SUCCESSFUL } from './auth.constants';
 import { AuthHelper } from './helpers/auth.helpers';
 
 @Injectable({ scope: Scope.REQUEST })
@@ -91,27 +103,19 @@ export class AuthService extends BaseService {
     // Ensure that the two passwords match.
     AuthHelper.comparePasswords(password1, password2);
 
-    // Create a new user and credentials.
-    let user: IUser = null;
-    let credentials: ICredentials = null;
     this.logger.debug(`Creating user ${name} with email ${email}`);
-    [user, credentials] = await this.getData<[IUser, ICredentials]>(
-      'create_user',
-      [
-        {
-          name,
-          email,
-          password: password1,
-        },
-      ],
-    );
+    await this.getData<[IUser, ICredentials]>(CREATE_USER, [
+      {
+        name,
+        email,
+        password: password1,
+      },
+    ]);
 
-    // Add the credentials to the user.
-    user = { ...user, credentials };
     this.logger.debug(`User ${name} created`);
 
     // Return a success message.
-    return this.generateMessage('Registration successful');
+    return this.generateMessage(REGISTRATION_SUCCESSFUL);
   }
 
   /**
@@ -129,11 +133,11 @@ export class AuthService extends BaseService {
     const { email, password1 } = dtoIn;
 
     // Get the user by email
-    const user = await this.getData<User>('get_user_by_email', email);
+    const user = await this.getData<User>(GET_USER_BY_EMAIL, email);
 
     // Check the password
     if (!user) {
-      throw new BadRequestException('Cannot get user.');
+      throw new BadRequestException(INVALID_CREDENTIALS);
     }
 
     if (!(await verify(user.password, password1))) {
@@ -156,16 +160,18 @@ export class AuthService extends BaseService {
    * @returns Promise<IMessage> - Message indicating the success of the logout
    */
   public async logout(refreshToken: string): Promise<MessageDto> {
+    // 1. Verify refresh token
     const { id, tokenId } =
       await this.jwtService.verifyUserToken<IRefreshToken>(
         refreshToken,
         TokenType.REFRESH,
       );
+    // 1. 1. Throw error if token is invalid
     if (!id || !tokenId) {
-      throw new BadRequestException('Invalid token');
+      throw new BadRequestException(INVALID_TOKEN);
     }
     await this.createBlacklistedToken(id, tokenId, 3600); // blacklist the refresh token
-    return this.generateMessage('Logout successful'); // return success message
+    return this.generateMessage(LOGOUT_SUCCESSFUL); // return success message
   }
 
   /**
@@ -175,7 +181,7 @@ export class AuthService extends BaseService {
    * @returns Promise<IUser> - User object
    */
   public async getMe(id: string): Promise<UserDto> {
-    return new UserDto(await this.getData<User>('get_user_by_id', id));
+    return new UserDto(await this.getData<User>(GET_USER_BY_ID, id));
   }
 
   /**
@@ -219,7 +225,7 @@ export class AuthService extends BaseService {
     await this.checkIfTokenIsBlacklisted(id, tokenId);
 
     const [user, credentials] = await this.getData<[User, Credentials]>(
-      'get_user_by_credentials',
+      GET_USER_BY_CREDENTIALS,
       {
         userId: id,
         version,
@@ -256,7 +262,7 @@ export class AuthService extends BaseService {
     );
 
     if (!isUndefined(time) && !isNull(time)) {
-      throw new UnauthorizedException('Invalid token');
+      throw new UnauthorizedException(INVALID_TOKEN);
     }
   }
 
@@ -269,11 +275,11 @@ export class AuthService extends BaseService {
    * @throws UnauthorizedException - If the provided credentials are invalid
    */
   public async initTenant(): Promise<TenantAuthorizedDto> {
-    const tenant: ITenant = await this.getData<ITenant>('verify_tenant');
+    const tenant: ITenant = await this.getData<ITenant>(VERIFY_TENANT);
     if (tenant) {
       return { apiKey: tenant.id };
     } else {
-      throw new ForbiddenException('Tenant not exists.');
+      throw new ForbiddenException(TENANT_NOT_EXISTS);
     }
   }
 

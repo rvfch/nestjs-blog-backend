@@ -1,6 +1,7 @@
 import {
   EMAIL_ALREADY_IN_USE,
   INVALID_CREDENTIALS,
+  NAME_MUST_BE_DIFFERENT,
 } from '@app/common/constants/errors.constants';
 import { BaseService } from '@app/common/core/services/base.service';
 import { TenantStateService } from '@app/common/core/services/tenant-state.service';
@@ -151,7 +152,7 @@ export class UsersService extends BaseService {
 
     if (!isUndefined(name) && !isNull(name)) {
       if (name === user.name) {
-        throw new RpcException('Name must be different');
+        throw new RpcException(NAME_MUST_BE_DIFFERENT);
       }
 
       user.name = formatName(name);
@@ -177,7 +178,7 @@ export class UsersService extends BaseService {
 
   private throwUnauthorizedException(user: undefined | null | User): void {
     if (isUndefined(user) || isNull(user)) {
-      throw new RpcException('Invalid credentials');
+      throw new RpcException(INVALID_CREDENTIALS);
     }
   }
 

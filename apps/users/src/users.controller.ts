@@ -1,3 +1,12 @@
+import {
+  CREATE_BLACKLISTED_TOKEN,
+  CREATE_USER,
+  GET_USER_BY_CREDENTIALS,
+  GET_USER_BY_EMAIL,
+  GET_USER_BY_EMAIL_UNCHECKED,
+  GET_USER_BY_ID,
+  VERIFY_BLACKLISTED_TOKEN,
+} from '@app/common/constants/constants';
 import { BaseController } from '@app/common/core/controllers/base.controller';
 import { TenantInterceptor } from '@app/common/core/interceptors/tenant.interceptor';
 import { TenantStateService } from '@app/common/core/services/tenant-state.service';
@@ -34,7 +43,7 @@ export class UsersController extends BaseController {
    * @param {SignUpDto} payload - The payload containing the user's details.
    * @returns {Promise<[User, Credentials]>} - The created user and its credentials.
    */
-  @MessagePattern('create_user')
+  @MessagePattern(CREATE_USER)
   public async create(
     @Payload() payload: [UserDto, any],
     @Ctx() ctx: RedisContext,
@@ -49,7 +58,7 @@ export class UsersController extends BaseController {
    * @param {BlacklistedTokenDto} payload - The payload containing the token details.
    * @returns {Promise<boolean>} - Returns true if token is blacklisted, else false.
    */
-  @MessagePattern('verify_blacklisted_token')
+  @MessagePattern(VERIFY_BLACKLISTED_TOKEN)
   public async verifyBlacklistedToken(
     @Payload() payload: [BlacklistedTokenDto, any],
     @Ctx() ctx: RedisContext,
@@ -65,7 +74,7 @@ export class UsersController extends BaseController {
    * @param {string} payload - The payload containing the user's email.
    * @returns {Promise<User>} - The retrieved user.
    */
-  @MessagePattern('get_user_by_email')
+  @MessagePattern(GET_USER_BY_EMAIL)
   public async getByEmail(
     @Payload() payload: [string, any],
     @Ctx() ctx: RedisContext,
@@ -80,7 +89,7 @@ export class UsersController extends BaseController {
    * @param {string} payload - The payload containing the user's ID.
    * @returns {Promise<User>} - The retrieved user.
    */
-  @MessagePattern('get_user_by_id')
+  @MessagePattern(GET_USER_BY_ID)
   public async getById(
     @Payload() payload: [string, any],
     @Ctx() ctx: RedisContext,
@@ -95,7 +104,7 @@ export class UsersController extends BaseController {
    * @param {string} payload - The payload containing the user's email.
    * @returns {Promise<User>} - The retrieved user.
    */
-  @MessagePattern('get_user_by_email_unchecked')
+  @MessagePattern(GET_USER_BY_EMAIL_UNCHECKED)
   public async getByEmailUnchecked(
     @Payload() payload: [string, any],
     @Ctx() ctx: RedisContext,
@@ -110,7 +119,7 @@ export class UsersController extends BaseController {
    * @param {BlacklistedTokenDto} payload - The payload containing the token details.
    * @returns {Promise<BlacklistedToken>} - The created blacklisted token.
    */
-  @MessagePattern('create_blacklisted_token')
+  @MessagePattern(CREATE_BLACKLISTED_TOKEN)
   public async createBlacklistedToken(
     @Payload() payload: [BlacklistedTokenDto, any],
     @Ctx() ctx: RedisContext,
@@ -126,7 +135,7 @@ export class UsersController extends BaseController {
    * @param {ICredentials} payload - The payload containing the user's credentials.
    * @returns {Promise<UserDto>} - The retrieved user.
    */
-  @MessagePattern('get_user_by_credentials')
+  @MessagePattern(GET_USER_BY_CREDENTIALS)
   public async getByCredentials(
     @Payload() payload: [CredentialsDto, any],
     @Ctx() ctx: RedisContext,
