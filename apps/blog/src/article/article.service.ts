@@ -1,31 +1,25 @@
-import {
-  BadRequestException,
-  Inject,
-  Injectable,
-  NotFoundException,
-  Scope,
-} from '@nestjs/common';
-import { Article } from '@app/common/entity/article.model';
-import { InjectModel } from '@nestjs/sequelize';
-import { BaseService } from '@app/common/core/services/base.service';
+import { Inject, Injectable, NotFoundException, Scope } from '@nestjs/common';
 import { Sequelize } from 'sequelize-typescript';
-import { TenantStateService } from '@app/common/core/services/tenant-state.service';
+import { Includeable } from 'sequelize';
+import { ClientProxy } from '@nestjs/microservices';
+import { InjectModel } from '@nestjs/sequelize';
+
+import { Article } from '@app/common/entity/article.model';
 import { ArticleImage } from '@app/common/entity/article-image.model';
 import { User } from '@app/common/entity/user.model';
+import { IArticle } from '@app/common/entity/interface/article.interface';
+import { ArticleStatus } from '@app/common/entity/enums/articlestatus.enum';
+
+import { BaseService } from '@app/common/core/services/base.service';
+import { TenantStateService } from '@app/common/core/services/tenant-state.service';
+
 import { ArticleDto } from '@app/common/dto/blog/article/article.dto';
 import { CreateArticleDto } from '@app/common/dto/blog/article/create-article.dto';
 import { UpdateArticleDto } from '@app/common/dto/blog/article/update-article.dto';
+import { PublishArticleDto } from '@app/common/dto/blog/article/publish-article.dto';
+import { RemoveArticleDto } from '@app/common/dto/blog/article/remove-article.dto';
 import { PageDto } from '@app/common/dto/utils/page.dto';
 import { MessageDto } from '@app/common/dto/utils/message.dto';
-import { CACHE_MANAGER } from '@nestjs/cache-manager';
-import { Cache } from 'cache-manager';
-import { IArticle } from '@app/common/entity/interface/article.interface';
-import { ArticleStatus } from '@app/common/entity/enums/articlestatus.enum';
-import { PublishArticleDto } from '@app/common/dto/blog/article/publish-article.dto';
-import { FindOptions, Includeable } from 'sequelize';
-import { Comment } from '@app/common/entity/comment.model';
-import { ClientProxy } from '@nestjs/microservices';
-import { RemoveArticleDto } from '@app/common/dto/blog/article/remove-article.dto';
 
 @Injectable({ scope: Scope.REQUEST })
 export class ArticleService extends BaseService {
@@ -50,17 +44,14 @@ export class ArticleService extends BaseService {
     dtoIn: CreateArticleDto,
     userId: string,
   ): Promise<ArticleDto> {
-    // Change the return type if needed
     // 1. Get tenant id
     const tenantId = this.getTenantId();
 
     // 2. Fetch the user
-    const user = await this.getData<User>('get_user_by_id', userId);
+    const user = await this.getUserById(userId);
 
     // 3. Create article
-    let article = this.articleRepository
-      .schema(tenantId)
-      .build({ ...dtoIn, author: userId });
+    let article = this.buildArticle(dtoIn, userId, tenantId);
 
     await this.saveEntity(article, true);
 
@@ -75,6 +66,10 @@ export class ArticleService extends BaseService {
 
     // 5. Return article with user
     return new ArticleDto(article); // Assuming you've created a new DTO or modified the existing one
+  }
+
+  private async getUserById(id: string): Promise<User> {
+    return await this.getData<User>('get_user_by_id', id);
   }
 
   /**
@@ -135,7 +130,7 @@ export class ArticleService extends BaseService {
       this.createIncludeOption(this.getTenantId()),
     );
 
-    // 2. Change status to PUBLISHED
+    // 2. Change status to PUBLISHED and save
     await article.update({ status: ArticleStatus.PUBLISHED });
     await this.saveEntity(article);
 
@@ -208,7 +203,7 @@ export class ArticleService extends BaseService {
     // 3. Search for the article with the provided ID
     const article = await this.articleRepository
       .schema(tenantId)
-      .findOne({ where: { id }, ...options });
+      .findOne({ ...options, where: { id } });
 
     return new ArticleDto(article);
   }
@@ -230,27 +225,7 @@ export class ArticleService extends BaseService {
     await this.validateOwnershipOfArticle(id, userId);
 
     // 3. Update the article
-    const [numberOfAffectedRows, [updatedArticle]] =
-      await this.articleRepository
-        .schema(this.getTenantId())
-        .update({ ...data }, { where: { id }, returning: true });
-
-    // 4. Update the image URL in ArticleImage.schema if it exists
-    const existingImage = await this.imageRepository
-      .schema(this.getTenantId())
-      .findOne({ where: { articleId: id } });
-
-    if (existingImage) {
-      await this.imageRepository
-        .schema(this.getTenantId())
-        .update({ url: imageUrl }, { where: { articleId: id } });
-      updatedArticle.image = existingImage;
-    }
-
-    // 5. Check if the article was updated successfully
-    if (numberOfAffectedRows === 0) {
-      throw new NotFoundException(`Article with ID ${id} not found`);
-    }
+    const updatedArticle = await this.updateArticleAndImage(id, data, imageUrl);
 
     return new ArticleDto(updatedArticle);
   }
@@ -311,5 +286,38 @@ export class ArticleService extends BaseService {
     this.isEntityExists(article, 'Article');
 
     return article;
+  }
+
+  private buildArticle(
+    dtoIn: CreateArticleDto,
+    userId: string,
+    tenantId: string,
+  ): Article {
+    return this.articleRepository
+      .schema(tenantId)
+      .build({ ...dtoIn, author: userId });
+  }
+
+  private async updateArticleAndImage(
+    id: string,
+    data: any,
+    imageUrl: string,
+  ): Promise<Article> {
+    const [numberOfAffectedRows, [updatedArticle]] =
+      await this.articleRepository
+        .schema(this.getTenantId())
+        .update({ ...data }, { where: { id }, returning: true });
+    if (imageUrl) {
+      await this.imageRepository
+        .schema(this.getTenantId())
+        .update({ url: imageUrl }, { where: { articleId: id } });
+      updatedArticle.image = await this.imageRepository
+        .schema(this.getTenantId())
+        .findOne({ where: { articleId: id } });
+    }
+    if (numberOfAffectedRows === 0) {
+      throw new NotFoundException(`Article with ID ${id} not found`);
+    }
+    return updatedArticle;
   }
 }

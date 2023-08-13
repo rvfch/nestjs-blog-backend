@@ -49,11 +49,6 @@ export class ArticleDto
   status: ArticleStatus;
 
   @ApiProperty()
-  @Exclude({ toPlainOnly: true })
-  @IsUUID(4)
-  author?: string;
-
-  @ApiProperty()
   @IsString()
   imageUrl?: string;
 
