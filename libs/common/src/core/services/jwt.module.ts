@@ -16,6 +16,4 @@ import { TenantStateService } from './tenant-state.service';
   providers: [TenantStateService, JwtService],
   exports: [JwtService],
 })
-export class JwtModule {
-  constructor() {}
-}
+export class JwtModule {}

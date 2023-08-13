@@ -1,3 +1,6 @@
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+require('dotenv').config();
+
 const publicKey = process.env.JWT_PUBLIC_KEY;
 const privateKey = process.env.JWT_PRIVATE_KEY;
 
@@ -14,8 +17,8 @@ export const configBase = {
     ttl: parseInt(process.env.REDIS_TTL, 10) || 60,
   },
   throttler: {
-    ttl: parseInt(process.env.THROTTLE_TTL, 10),
-    limit: parseInt(process.env.THROTTLE_LIMIT, 10),
+    ttl: parseInt(process.env.THROTTLE_TTL, 10) || 60,
+    limit: parseInt(process.env.THROTTLE_LIMIT, 10) || 20,
   },
   jwt: {
     access: {
