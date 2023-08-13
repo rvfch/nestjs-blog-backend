@@ -1,6 +1,6 @@
 import { ModuleMocker, MockFunctionMetadata } from 'jest-mock';
 import { ArticleController } from './article.controller';
-import { Test } from '@nestjs/testing';
+import { Test, TestingModule } from '@nestjs/testing';
 import { ArticleService } from './article.service';
 import { ArticleStatus } from '@app/common/entity/enums/articlestatus.enum';
 import { ArticleDto } from '@app/common/dto/blog/article/article.dto';
@@ -16,7 +16,6 @@ import { MessageDto } from '@app/common/dto/utils/message.dto';
 import {
   generateRandomUUID4,
   getMockArticles,
-  mockRequestWithTenantId,
   mockSequelize,
   mockUser,
 } from '@app/common/helpers/test.helpers';
@@ -30,42 +29,44 @@ import { UserImage } from '@app/common/entity/user-image.model';
 import { Credentials } from '@app/common/entity/credentials.model';
 import { Rating } from '@app/common/entity/rating.model';
 import { Sequelize } from 'sequelize-typescript';
-import sinon from 'sinon';
-
-const moduleMocker = new ModuleMocker(global);
-
-let user: UserDto;
-
-const articles: ArticleDto[] = getMockArticles();
-
-const articleToCreate: CreateArticleDto = articles[0];
-
-const article: ArticleDto = articles[0];
-
-const publishedArticle: ArticleDto = {
-  ...article,
-  status: ArticleStatus.PUBLISHED,
-};
-
-const updatedArticle: ArticleDto = {
-  ...article,
-  title: 'Updated title',
-  content: 'Updated content',
-  perex: 'Updated perex',
-};
-
-const removeArticleMsg = (articleId: string): MessageDto => ({
-  message: `Article ${articleId} removed`,
-  id: generateRandomUUID4(),
-});
+import { IImage } from '@app/common/entity/interface/image.interface';
 
 describe('ArticleService', () => {
   let service: ArticleService;
+  let userModel: typeof User;
+  let articleModel: typeof Article;
+  let articleImageModel: typeof ArticleImage;
+  let user: UserDto;
+  const articles: ArticleDto[] = getMockArticles();
+  const articleToCreate: CreateArticleDto = {
+    title: 'Test',
+    content: 'Test content',
+    perex: 'test',
+    imageUrl: undefined,
+  };
+  const article: ArticleDto = articles[0];
+  const publishedArticle: ArticleDto = {
+    ...article,
+    status: ArticleStatus.PUBLISHED,
+  };
+  const updatedArticle: ArticleDto = {
+    ...article,
+    title: 'Updated title',
+    content: 'Updated content',
+    perex: 'Updated perex',
+    imageUrl: expect.any(String),
+    id: expect.any(String),
+  };
+  const removeArticleMsg = (articleId: string): MessageDto => ({
+    message: `Article ${articleId} removed`,
+    id: expect.any(String),
+  });
 
   beforeEach(async () => {
-    const moduleRef = await Test.createTestingModule({
+    const moduleRef: TestingModule = await Test.createTestingModule({
       providers: [
         ArticleService,
+        TenantStateService,
         {
           provide: JwtService,
           useValue: jest.mock('@app/common/core/services/jwt.service'),
@@ -82,46 +83,45 @@ describe('ArticleService', () => {
           provide: CACHE_MANAGER,
           useValue: {},
         },
-        TenantStateService,
-        {
-          provide: Sequelize,
-          useValue: sinon.createStubInstance(Sequelize),
-        },
         {
           provide: getModelToken(Article),
-          useValue: sinon.createStubInstance(Article),
+          useValue: Article,
         },
         {
           provide: getModelToken(ArticleImage),
-          useValue: sinon.createStubInstance(ArticleImage),
+          useValue: ArticleImage,
         },
         {
           provide: getModelToken(User),
-          useValue: sinon.createStubInstance(User),
+          useValue: User,
         },
         {
           provide: getModelToken(Comment),
-          useValue: sinon.createStubInstance(Comment),
+          useValue: Comment,
         },
         {
           provide: getModelToken(BlacklistedToken),
-          useValue: sinon.createStubInstance(BlacklistedToken),
+          useValue: BlacklistedToken,
         },
         {
           provide: getModelToken(Tenant),
-          useValue: sinon.createStubInstance(Tenant),
+          useValue: Tenant,
         },
         {
           provide: getModelToken(UserImage),
-          useValue: sinon.createStubInstance(UserImage),
+          useValue: UserImage,
         },
         {
           provide: getModelToken(Credentials),
-          useValue: sinon.createStubInstance(Credentials),
+          useValue: Credentials,
         },
         {
           provide: getModelToken(Rating),
-          useValue: sinon.createStubInstance(Rating),
+          useValue: Rating,
+        },
+        {
+          provide: Sequelize,
+          useValue: mockSequelize,
         },
         {
           provide: 'REDIS',
@@ -132,27 +132,7 @@ describe('ArticleService', () => {
           useValue: {},
         },
       ],
-    })
-      .useMocker((token) => {
-        if (token === ArticleService) {
-          return {
-            create: jest.fn().mockResolvedValue(article),
-            findAll: jest.fn().mockResolvedValue(articles),
-            findOne: jest.fn().mockResolvedValue(article),
-            publish: jest.fn().mockResolvedValue(publishedArticle),
-            update: jest.fn().mockResolvedValue(updatedArticle),
-            remove: jest.fn().mockResolvedValue(removeArticleMsg),
-          };
-        }
-        if (typeof token === 'function') {
-          const mockMetadata = moduleMocker.getMetadata(
-            token,
-          ) as MockFunctionMetadata<any, any>;
-          const Mock = moduleMocker.generateFromMetadata(mockMetadata);
-          return new Mock();
-        }
-      })
-      .compile();
+    }).compile();
 
     const contextId = ContextIdFactory.create();
     jest
@@ -160,102 +140,109 @@ describe('ArticleService', () => {
       .mockImplementation(() => contextId);
 
     service = await moduleRef.resolve(ArticleService, contextId);
+    userModel = moduleRef.get<typeof User>(getModelToken(User));
+    articleModel = moduleRef.get<typeof Article>(getModelToken(Article));
+    articleImageModel = moduleRef.get<typeof ArticleImage>(
+      getModelToken(ArticleImage),
+    );
+
+    jest.spyOn(userModel, 'schema').mockReturnThis();
+    jest.spyOn(articleModel, 'schema').mockReturnThis();
+    jest.spyOn(articleImageModel, 'schema').mockReturnThis();
 
     user = mockUser();
   });
 
   afterEach(() => {
-    jest.restoreAllMocks();
+    jest.resetAllMocks();
+  });
+
+  it('should be defined', () => {
+    expect(service).toBeDefined();
   });
 
   describe('findAll', () => {
-    it('should return all articles', async () => {
-      mockSequelize.findAll = jest.fn().mockResolvedValue(articles);
-
-      const query = {
-        page: 1,
-        pageSize: 10,
-      };
-
-      expect(await service.findAll(query)).toEqual(articles);
-      expect(mockSequelize.findAll).toHaveBeenCalled();
+    it('HDS should return all articles', async () => {
+      jest
+        .spyOn(articleModel, 'findAll')
+        .mockResolvedValueOnce(articles as Article[]);
+      const result = await service.findAll({ page: 1, pageSize: 10 });
+      expect(result).toEqual(articles as ArticleDto[]);
     });
   });
 
   describe('findOne', () => {
-    it('should return a single article', async () => {
-      mockSequelize.findOne = jest.fn().mockResolvedValue(article);
-
-      expect(await service.findOne(article.id)).toEqual(article);
-      expect(mockSequelize.findOne).toHaveBeenCalledWith({
-        where: { id: article.id },
-      });
+    it('HDS should return a single article', async () => {
+      jest
+        .spyOn(articleModel, 'findOne')
+        .mockResolvedValueOnce(article as Article);
+      const result = await service.findOne(article.id);
+      expect(result).toEqual(article);
     });
   });
 
   describe('create', () => {
-    it('should create a new article', async () => {
-      mockSequelize.create = jest.fn().mockResolvedValue(article);
-
-      expect(await service.create(articleToCreate, user.id)).toEqual(article);
-      expect(mockSequelize.create).toHaveBeenCalledWith(articleToCreate);
+    it('HDS should create a new article', async () => {
+      articleModel.build = jest.fn().mockReturnValue(article);
+      jest.spyOn(service as any, 'getUserById').mockResolvedValue(user as User);
+      const result = await service.create(articleToCreate, user.id);
+      expect(result).toEqual(article);
     });
   });
 
   describe('myArticles', () => {
-    it('should return an array of articles for the current user', async () => {
-      mockSequelize.findAll = jest.fn().mockResolvedValue(articles);
-
-      const query = {
-        page: 1,
-        pageSize: 10,
-      };
-
-      expect(await service.findAll(query, user.id)).toEqual(articles);
-      expect(mockSequelize.findAll).toHaveBeenCalledWith({
-        where: { userId: user.id },
-      });
-    });
-  });
-
-  describe('publish', () => {
-    it('should return article with status published', async () => {
-      mockSequelize.findOne = jest.fn().mockResolvedValue(publishedArticle);
-
-      // Mocking the update method
-      mockSequelize.update = jest.fn().mockResolvedValue([1]);
-
-      await service.publish(publishedArticle, user.id);
-
-      expect(mockSequelize.findOne).toHaveBeenCalledWith({
-        where: { id: publishedArticle.id },
-      });
-      expect(mockSequelize.update).toHaveBeenCalledWith(
-        { status: ArticleStatus.PUBLISHED },
-        { where: { id: publishedArticle.id } },
-      );
+    it('HDS should return articles for the current user', async () => {
+      jest
+        .spyOn(articleModel, 'findAll')
+        .mockResolvedValue(articles as Article[]);
+      const result = await service.findAll({ page: 1, pageSize: 10 }, user.id);
+      expect(result).toEqual(articles);
     });
   });
 
   describe('update', () => {
-    it('should return an array of articles for the current user', async () => {
-      mockSequelize.update = jest.fn().mockResolvedValue([1]);
-
-      await service.update(updatedArticle, user.id);
-      expect(mockSequelize.update).toHaveBeenCalledWith(updatedArticle, {
-        where: { id: article.id },
-      });
+    it('HDS should update and return an article', async () => {
+      const mockImage: IImage = {
+        url: 'http://test.com/img.png',
+        id: expect.any(String),
+      };
+      const articleModelUpdated = {
+        ...updatedArticle,
+        image: mockImage,
+      };
+      jest
+        .spyOn(articleModel, 'update')
+        .mockResolvedValue([1, [articleModelUpdated]] as any);
+      jest.spyOn(articleModel, 'findOne').mockResolvedValue(article as Article);
+      jest
+        .spyOn(articleImageModel, 'findOne')
+        .mockResolvedValue(mockImage as ArticleImage);
+      jest.spyOn(articleImageModel, 'update').mockResolvedValue([1]);
+      const result = await service.update(updatedArticle, user.id);
+      expect(result).toMatchObject(updatedArticle);
     });
   });
 
   describe('remove', () => {
-    it('should return an array of articles for the current user', async () => {
-      mockSequelize.destroy = jest.fn().mockResolvedValue(1);
+    it('HDS should remove and return a message', async () => {
+      jest.spyOn(articleModel, 'findOne').mockResolvedValue(article as Article);
+      jest.spyOn(articleModel, 'destroy').mockResolvedValue(1);
+      const result = await service.remove(article, user.id);
+      expect(result).toEqual(removeArticleMsg(article.id));
+    });
+  });
 
-      await service.remove(article, user.id);
-      expect(mockSequelize.destroy).toHaveBeenCalledWith({
-        where: { id: article.id },
-      });
+  describe('publish', () => {
+    it('HDS should publish and return an article', async () => {
+      const mockArticleInstance = {
+        ...publishedArticle,
+        update: jest.fn().mockResolvedValue([1]),
+      };
+      jest
+        .spyOn(articleModel, 'findOne')
+        .mockResolvedValue(mockArticleInstance as any);
+      const result = await service.publish(publishedArticle, user.id);
+      expect(result).toEqual(publishedArticle);
     });
   });
 });

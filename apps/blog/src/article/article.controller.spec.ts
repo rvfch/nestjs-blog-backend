@@ -122,59 +122,44 @@ describe('ArticleController', () => {
     user = mockUser();
   });
 
-  describe('findAll', () => {
-    it('should return an array of articles', async () => {
-      const query = {
-        page: 1,
-        pageSize: 10,
-      };
-      jest.spyOn(service, 'findAll').mockResolvedValue(articles);
+  it('should be defined', () => {
+    expect(service).toBeDefined();
+    expect(controller).toBeDefined();
+  });
 
+  describe('CRUD operations', () => {
+    it('should return an array of articles', async () => {
+      const query = { page: 1, pageSize: 10 };
+      jest.spyOn(service, 'findAll').mockResolvedValue(articles);
       expect(await controller.findAll(query, mockRequestWithTenantId())).toBe(
         articles,
       );
     });
-  });
 
-  describe('create', () => {
     it('should successfully create an article', async () => {
       jest.spyOn(service, 'create').mockResolvedValue(article);
-
       expect(
         await controller.create(mockRequestWithTenantId(), user.id, article),
       ).toBe(article);
     });
-  });
 
-  describe('myArticles', () => {
-    it('should return an array of articles for the current user', async () => {
-      const query = {
-        page: 1,
-        pageSize: 10,
-      };
-
+    it('should return articles for the current user', async () => {
+      const query = { page: 1, pageSize: 10 };
       jest.spyOn(service, 'findAll').mockResolvedValue(articles);
-
       expect(
         await controller.myArticles(query, user.id, mockRequestWithTenantId()),
       ).toBe(articles);
     });
-  });
 
-  describe('publish', () => {
     it('should return article with status published', async () => {
       jest.spyOn(service, 'publish').mockResolvedValue(publishedArticle);
-
       expect(
         await controller.publish(mockRequestWithTenantId(), user.id, article),
       ).toBe(publishedArticle);
     });
-  });
 
-  describe('update', () => {
-    it('should return an array of articles for the current user', async () => {
+    it('should return the updated article', async () => {
       jest.spyOn(service, 'update').mockResolvedValue(updatedArticle);
-
       expect(
         await controller.update(
           updatedArticle,
@@ -183,14 +168,10 @@ describe('ArticleController', () => {
         ),
       ).toBe(updatedArticle);
     });
-  });
 
-  describe('remove', () => {
-    it('should return an array of articles for the current user', async () => {
+    it('should return a message after removing an article', async () => {
       const result = removeArticleMsg(article.id);
-
       jest.spyOn(service, 'remove').mockResolvedValue(result);
-
       expect(
         await controller.remove(mockRequestWithTenantId(), article, user.id),
       ).toBe(result);
