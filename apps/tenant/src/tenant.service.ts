@@ -1,25 +1,25 @@
+import { SequelizeConfig } from '@app/common/config/sequelize.config';
+import { BaseService } from '@app/common/core/services/base.service';
+import { TenantStateService } from '@app/common/core/services/tenant-state.service';
+import { TenantDto } from '@app/common/dto/tenant/tenant.dto';
+import { ArticleImage } from '@app/common/entity/article-image.model';
+import { Article } from '@app/common/entity/article.model';
+import { BlacklistedToken } from '@app/common/entity/blacklisted-token.model';
+import { Comment } from '@app/common/entity/comment.model';
+import { Credentials } from '@app/common/entity/credentials.model';
+import { Rating } from '@app/common/entity/rating.model';
+import { Tenant } from '@app/common/entity/tenant.model';
+import { UserImage } from '@app/common/entity/user-image.model';
+import { User } from '@app/common/entity/user.model';
 import {
   Injectable,
   InternalServerErrorException,
   NotFoundException,
   Scope,
 } from '@nestjs/common';
-import { Tenant } from '@app/common/entity/tenant.model';
-import { Sequelize } from 'sequelize-typescript';
-import { Article } from '@app/common/entity/article.model';
-import { Rating } from '@app/common/entity/rating.model';
-import { Comment } from '@app/common/entity/comment.model';
-import { ArticleImage } from '@app/common/entity/article-image.model';
-import { SequelizeConfig } from '@app/common/config/sequelize.config';
-import { BaseService } from '@app/common/core/services/base.service';
-import { User } from '@app/common/entity/user.model';
-import { Credentials } from '@app/common/entity/credentials.model';
 import { InjectModel } from '@nestjs/sequelize';
 import { hash } from 'argon2';
-import { BlacklistedToken } from '@app/common/entity/blacklisted-token.model';
-import { TenantStateService } from '@app/common/core/services/tenant-state.service';
-import { UserImage } from '@app/common/entity/user-image.model';
-import { TenantDto } from '@app/common/dto/tenant/tenant.dto';
+import { Sequelize } from 'sequelize-typescript';
 
 @Injectable({ scope: Scope.REQUEST })
 export class TenantService extends BaseService {

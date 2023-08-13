@@ -1,21 +1,21 @@
+import { RedisModule } from '@app/common';
+import { CacheConfig } from '@app/common/config/cache.config';
+import { ThrottlerConfig } from '@app/common/config/throttler.config';
+import { AuthGuard } from '@app/common/core/guards/auth.guard';
+import { TenantMiddleware } from '@app/common/core/middleware/tenant.middleware';
+import { JwtService } from '@app/common/core/services/jwt.service';
+import { TenantStateService } from '@app/common/core/services/tenant-state.service';
+import { DatabaseModule } from '@app/common/database/database.module';
+import { CacheModule } from '@nestjs/cache-manager';
 import { MiddlewareConsumer, Module } from '@nestjs/common';
+import { ConfigModule, ConfigService } from '@nestjs/config';
+import { APP_GUARD } from '@nestjs/core';
+import { ClientProxyFactory, Transport } from '@nestjs/microservices';
+import { ThrottlerModule } from '@nestjs/throttler';
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
-import { ConfigModule, ConfigService } from '@nestjs/config';
-import { RedisModule } from '@app/common';
-import { DatabaseModule } from '@app/common/database/database.module';
 import { config } from './config/app.config';
-import { ClientProxyFactory, Transport } from '@nestjs/microservices';
-import { CacheModule } from '@nestjs/cache-manager';
-import { APP_GUARD } from '@nestjs/core';
-import { AuthGuard } from '@app/common/core/guards/auth.guard';
-import { ThrottlerModule } from '@nestjs/throttler';
-import { TenantMiddleware } from '@app/common/core/middleware/tenant.middleware';
-import { ThrottlerConfig } from '@app/common/config/throttler.config';
 import { configValidation } from './config/schema/app.config.schema';
-import { TenantStateService } from '@app/common/core/services/tenant-state.service';
-import { CacheConfig } from '@app/common/config/cache.config';
-import { JwtService } from '@app/common/core/services/jwt.service';
 
 @Module({
   imports: [

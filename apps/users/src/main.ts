@@ -1,9 +1,9 @@
-import { NestFactory } from '@nestjs/core';
-import { UsersModule } from './users.module';
-import { MicroserviceOptions, Transport } from '@nestjs/microservices';
+import { AllExceptionsFilter } from '@app/common/core/exceptions/exception.filter';
 import { ValidationPipe } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { AllExceptionsFilter } from '@app/common/core/exceptions/exception.filter';
+import { NestFactory } from '@nestjs/core';
+import { MicroserviceOptions, Transport } from '@nestjs/microservices';
+import { UsersModule } from './users.module';
 
 async function bootstrap() {
   const appContext = await NestFactory.createApplicationContext(UsersModule);

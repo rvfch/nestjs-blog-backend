@@ -1,14 +1,14 @@
-import { MiddlewareConsumer, Module, RequestMethod } from '@nestjs/common';
-import { ArticleService } from './article.service';
-import { ArticleController } from './article.controller';
-import { SequelizeModule } from '@nestjs/sequelize';
-import { Article } from '@app/common/entity/article.model';
-import { TenantStateService } from '@app/common/core/services/tenant-state.service';
-import { ArticleImage } from '@app/common/entity/article-image.model';
 import { TenantMiddleware } from '@app/common/core/middleware/tenant.middleware';
 import { JwtModule } from '@app/common/core/services/jwt.module';
+import { TenantStateService } from '@app/common/core/services/tenant-state.service';
+import { ArticleImage } from '@app/common/entity/article-image.model';
+import { Article } from '@app/common/entity/article.model';
+import { MiddlewareConsumer, Module, RequestMethod } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { ClientProxyFactory, Transport } from '@nestjs/microservices';
+import { SequelizeModule } from '@nestjs/sequelize';
+import { ArticleController } from './article.controller';
+import { ArticleService } from './article.service';
 
 @Module({
   imports: [SequelizeModule.forFeature([Article, ArticleImage]), JwtModule],

@@ -1,12 +1,12 @@
 import {
+  CallHandler,
+  ExecutionContext,
   Injectable,
   NestInterceptor,
-  ExecutionContext,
-  CallHandler,
 } from '@nestjs/common';
+import { GqlExecutionContext } from '@nestjs/graphql';
 import { Observable, from } from 'rxjs';
 import { switchMap } from 'rxjs/operators';
-import { GqlExecutionContext } from '@nestjs/graphql';
 import { CommentService } from '../comment.service';
 
 @Injectable()

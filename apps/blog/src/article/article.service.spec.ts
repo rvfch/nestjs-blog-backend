@@ -1,35 +1,32 @@
-import { ModuleMocker, MockFunctionMetadata } from 'jest-mock';
-import { ArticleController } from './article.controller';
-import { Test, TestingModule } from '@nestjs/testing';
-import { ArticleService } from './article.service';
-import { ArticleStatus } from '@app/common/entity/enums/articlestatus.enum';
-import { ArticleDto } from '@app/common/dto/blog/article/article.dto';
 import { JwtService } from '@app/common/core/services/jwt.service';
-import { ThrottlerStorage } from '@nestjs/throttler';
-import { ContextIdFactory, Reflector } from '@nestjs/core';
-import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import { TenantStateService } from '@app/common/core/services/tenant-state.service';
-import { getModelToken } from '@nestjs/sequelize';
-import { Article } from '@app/common/entity/article.model';
-import { ArticleImage } from '@app/common/entity/article-image.model';
+import { ArticleDto } from '@app/common/dto/blog/article/article.dto';
+import { CreateArticleDto } from '@app/common/dto/blog/article/create-article.dto';
+import { UserDto } from '@app/common/dto/users/user.dto';
 import { MessageDto } from '@app/common/dto/utils/message.dto';
+import { ArticleImage } from '@app/common/entity/article-image.model';
+import { Article } from '@app/common/entity/article.model';
+import { BlacklistedToken } from '@app/common/entity/blacklisted-token.model';
+import { Comment } from '@app/common/entity/comment.model';
+import { Credentials } from '@app/common/entity/credentials.model';
+import { ArticleStatus } from '@app/common/entity/enums/articlestatus.enum';
+import { IImage } from '@app/common/entity/interface/image.interface';
+import { Rating } from '@app/common/entity/rating.model';
+import { Tenant } from '@app/common/entity/tenant.model';
+import { UserImage } from '@app/common/entity/user-image.model';
+import { User } from '@app/common/entity/user.model';
 import {
-  generateRandomUUID4,
   getMockArticles,
   mockSequelize,
   mockUser,
 } from '@app/common/helpers/test.helpers';
-import { UserDto } from '@app/common/dto/users/user.dto';
-import { CreateArticleDto } from '@app/common/dto/blog/article/create-article.dto';
-import { User } from '@app/common/entity/user.model';
-import { Comment } from '@app/common/entity/comment.model';
-import { BlacklistedToken } from '@app/common/entity/blacklisted-token.model';
-import { Tenant } from '@app/common/entity/tenant.model';
-import { UserImage } from '@app/common/entity/user-image.model';
-import { Credentials } from '@app/common/entity/credentials.model';
-import { Rating } from '@app/common/entity/rating.model';
+import { CACHE_MANAGER } from '@nestjs/cache-manager';
+import { ContextIdFactory, Reflector } from '@nestjs/core';
+import { getModelToken } from '@nestjs/sequelize';
+import { Test, TestingModule } from '@nestjs/testing';
+import { ThrottlerStorage } from '@nestjs/throttler';
 import { Sequelize } from 'sequelize-typescript';
-import { IImage } from '@app/common/entity/interface/image.interface';
+import { ArticleService } from './article.service';
 
 describe('ArticleService', () => {
   let service: ArticleService;

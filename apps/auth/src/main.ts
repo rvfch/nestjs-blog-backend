@@ -1,14 +1,14 @@
-import { NestFactory } from '@nestjs/core';
-import { AuthModule } from './auth.module';
-import { ValidationPipe } from '@nestjs/common';
 import { RedisService } from '@app/common';
-import { MicroserviceOptions } from '@nestjs/microservices';
-import { ConfigService } from '@nestjs/config';
 import * as Constants from '@app/common/constants/constants';
-import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
-import helmet from 'helmet';
-import cookieParser from 'cookie-parser';
 import { AllExceptionsFilter } from '@app/common/core/exceptions/exception.filter';
+import { ValidationPipe } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
+import { NestFactory } from '@nestjs/core';
+import { MicroserviceOptions } from '@nestjs/microservices';
+import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import cookieParser from 'cookie-parser';
+import helmet from 'helmet';
+import { AuthModule } from './auth.module';
 
 async function bootstrap() {
   const app = await NestFactory.create(AuthModule);

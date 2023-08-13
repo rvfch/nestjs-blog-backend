@@ -1,5 +1,13 @@
-import { Rating } from '@app/common/entity/rating.model';
+import { POSTGRES_DUPLICATE_ERROR_MESSAGE } from '@app/common/constants/constants';
+import { CommentDto } from '@app/common/dto/blog/comments/comment.dto';
+import { CreateCommentDto } from '@app/common/dto/blog/comments/create-comment.dto';
+import { RateCommentDto } from '@app/common/dto/blog/comments/rate-comment.dto';
+import { UpdateCommentDto } from '@app/common/dto/blog/comments/update-comment.dto';
 import { Comment } from '@app/common/entity/comment.model';
+import { IComment } from '@app/common/entity/interface/comment.interface';
+import { Rating } from '@app/common/entity/rating.model';
+import { User } from '@app/common/entity/user.model';
+import { isNull, isUndefined } from '@app/common/helpers/validation.helpers';
 import {
   BadRequestException,
   ConflictException,
@@ -7,20 +15,11 @@ import {
   Injectable,
   InternalServerErrorException,
   NotFoundException,
-  Scope,
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 import { PubSubEngine } from 'graphql-subscriptions';
-import { Model, Sequelize } from 'sequelize-typescript';
-import { UpdateCommentDto } from '@app/common/dto/blog/comments/update-comment.dto';
-import { RateCommentDto } from '@app/common/dto/blog/comments/rate-comment.dto';
-import { isNull, isUndefined } from '@app/common/helpers/validation.helpers';
 import { QueryTypes, UniqueConstraintError } from 'sequelize';
-import { CreateCommentDto } from '@app/common/dto/blog/comments/create-comment.dto';
-import { POSTGRES_DUPLICATE_ERROR_MESSAGE } from '@app/common/constants/constants';
-import { CommentDto } from '@app/common/dto/blog/comments/comment.dto';
-import { User } from '@app/common/entity/user.model';
-import { IComment } from '@app/common/entity/interface/comment.interface';
+import { Model, Sequelize } from 'sequelize-typescript';
 
 @Injectable()
 export class CommentService {

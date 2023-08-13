@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { Multer } from 'multer';
 import * as fs from 'fs';
+import { Multer } from 'multer';
 
 export interface IFileResponse {
   url?: string;

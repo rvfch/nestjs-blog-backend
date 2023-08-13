@@ -1,13 +1,13 @@
+import { TenantInterceptor } from '@app/common/core/interceptors/tenant.interceptor';
+import { TenantDto } from '@app/common/dto/tenant/tenant.dto';
 import { Controller, UseInterceptors } from '@nestjs/common';
-import { TenantService } from './tenant.service';
 import {
   Ctx,
+  MessagePattern,
   Payload,
   RedisContext,
-  MessagePattern,
 } from '@nestjs/microservices';
-import { TenantDto } from '@app/common/dto/tenant/tenant.dto';
-import { TenantInterceptor } from '@app/common/core/interceptors/tenant.interceptor';
+import { TenantService } from './tenant.service';
 
 @Controller('tenant')
 export class TenantController {

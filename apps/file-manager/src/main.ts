@@ -1,8 +1,6 @@
-import { NestFactory } from '@nestjs/core';
-import { UploadModule } from './upload/upload.module';
-import { ConfigService } from '@nestjs/config';
 import { ValidationPipe } from '@nestjs/common';
-import cookieParser from 'cookie-parser';
+import { ConfigService } from '@nestjs/config';
+import { NestFactory } from '@nestjs/core';
 import helmet from 'helmet';
 import { FileManagerModule } from './file-manager.module';
 

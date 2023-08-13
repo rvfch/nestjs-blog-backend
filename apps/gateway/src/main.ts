@@ -1,8 +1,8 @@
-import { NestFactory } from '@nestjs/core';
-import { GatewayModule } from './gateway.module';
-import { createProxyMiddleware } from 'http-proxy-middleware';
-import { NestExpressApplication } from '@nestjs/platform-express';
 import { ConfigService } from '@nestjs/config';
+import { NestFactory } from '@nestjs/core';
+import { NestExpressApplication } from '@nestjs/platform-express';
+import { createProxyMiddleware } from 'http-proxy-middleware';
+import { GatewayModule } from './gateway.module';
 
 /**
  * This is API gateway app.

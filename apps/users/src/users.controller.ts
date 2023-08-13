@@ -1,21 +1,21 @@
-import { Controller, UseInterceptors } from '@nestjs/common';
-import { UsersService } from './users.service';
 import { BaseController } from '@app/common/core/controllers/base.controller';
+import { TenantInterceptor } from '@app/common/core/interceptors/tenant.interceptor';
+import { TenantStateService } from '@app/common/core/services/tenant-state.service';
+import { BlacklistedTokenDto } from '@app/common/dto/users/blacklisted-token.dto';
+import { CredentialsDto } from '@app/common/dto/users/credentials.dto';
+import { UserDto } from '@app/common/dto/users/user.dto';
+import { BlacklistedToken } from '@app/common/entity/blacklisted-token.model';
+import { Credentials } from '@app/common/entity/credentials.model';
+import { User } from '@app/common/entity/user.model';
+import { Controller, UseInterceptors } from '@nestjs/common';
 import {
   Ctx,
   MessagePattern,
   Payload,
   RedisContext,
 } from '@nestjs/microservices';
-import { User } from '@app/common/entity/user.model';
-import { Credentials } from '@app/common/entity/credentials.model';
 import { BlacklistedTokenService } from './blacklisted-token/blacklisted-token.service';
-import { UserDto } from '@app/common/dto/users/user.dto';
-import { BlacklistedTokenDto } from '@app/common/dto/users/blacklisted-token.dto';
-import { CredentialsDto } from '@app/common/dto/users/credentials.dto';
-import { BlacklistedToken } from '@app/common/entity/blacklisted-token.model';
-import { TenantStateService } from '@app/common/core/services/tenant-state.service';
-import { TenantInterceptor } from '@app/common/core/interceptors/tenant.interceptor';
+import { UsersService } from './users.service';
 
 @UseInterceptors(TenantInterceptor)
 @Controller('users')

@@ -1,16 +1,14 @@
-import { Resolver, Mutation, Args, Subscription, Query } from '@nestjs/graphql';
-import { Comment } from '@app/common/entity/comment.model';
-import { Rating } from '@app/common/entity/rating.model';
-import { RateCommentDto } from '@app/common/dto/blog/comments/rate-comment.dto';
-import { CommentService } from './comment.service';
-import { UseGuards, UseInterceptors } from '@nestjs/common';
-import { AuthGqlGuard } from '@app/common/core/guards/auth-gql.guard';
-import { TenantGqlInterceptor } from './interceptors/tenant-gql.interceptor';
-import { CreateCommentDto } from '@app/common/dto/blog/comments/create-comment.dto';
-import { IComment } from '@app/common/entity/interface/comment.interface';
-import { CommentDto } from '@app/common/dto/blog/comments/comment.dto';
 import { CurrentUser } from '@app/common/core/decorators/current-user.decorator';
 import { Public } from '@app/common/core/decorators/public.decorator';
+import { AuthGqlGuard } from '@app/common/core/guards/auth-gql.guard';
+import { CommentDto } from '@app/common/dto/blog/comments/comment.dto';
+import { CreateCommentDto } from '@app/common/dto/blog/comments/create-comment.dto';
+import { RateCommentDto } from '@app/common/dto/blog/comments/rate-comment.dto';
+import { Comment } from '@app/common/entity/comment.model';
+import { UseGuards, UseInterceptors } from '@nestjs/common';
+import { Args, Mutation, Query, Resolver, Subscription } from '@nestjs/graphql';
+import { CommentService } from './comment.service';
+import { TenantGqlInterceptor } from './interceptors/tenant-gql.interceptor';
 
 @UseGuards(AuthGqlGuard)
 @UseInterceptors(TenantGqlInterceptor)

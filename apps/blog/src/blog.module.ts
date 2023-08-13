@@ -1,22 +1,22 @@
-import { MiddlewareConsumer, Module, RequestMethod } from '@nestjs/common';
-import { ConfigModule, ConfigService } from '@nestjs/config';
 import { RedisModule } from '@app/common';
-import { DatabaseModule } from '@app/common/database/database.module';
-import { config } from './config/app.config';
-import { configValidation } from './config/app.config.schema';
-import { ArticleModule } from './article/article.module';
-import { TenantStateService } from '@app/common/core/services/tenant-state.service';
-import { CacheModule } from '@nestjs/cache-manager';
 import { CacheConfig } from '@app/common/config/cache.config';
-import { ThrottlerModule } from '@nestjs/throttler';
 import { ThrottlerConfig } from '@app/common/config/throttler.config';
-import { CommentModule } from './comment/comment.module';
-import { GraphQLModule } from '@nestjs/graphql';
-import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
 import { TenantMiddleware } from '@app/common/core/middleware/tenant.middleware';
 import { JwtModule } from '@app/common/core/services/jwt.module';
+import { TenantStateService } from '@app/common/core/services/tenant-state.service';
+import { DatabaseModule } from '@app/common/database/database.module';
+import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
+import { CacheModule } from '@nestjs/cache-manager';
+import { MiddlewareConsumer, Module, RequestMethod } from '@nestjs/common';
+import { ConfigModule } from '@nestjs/config';
+import { GraphQLModule } from '@nestjs/graphql';
+import { ThrottlerModule } from '@nestjs/throttler';
 import { Context } from 'graphql-ws';
+import { ArticleModule } from './article/article.module';
 import { BlogController } from './blog.controller';
+import { CommentModule } from './comment/comment.module';
+import { config } from './config/app.config';
+import { configValidation } from './config/app.config.schema';
 
 @Module({
   imports: [

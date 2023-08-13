@@ -3,19 +3,19 @@ import {
   INVALID_CREDENTIALS,
 } from '@app/common/constants/errors.constants';
 import { BaseService } from '@app/common/core/services/base.service';
-import { User } from '@app/common/entity/user.model';
-import { Injectable, Scope, UnauthorizedException } from '@nestjs/common';
-import { InjectModel } from '@nestjs/sequelize';
-import { Sequelize } from 'sequelize-typescript';
-import { isNull, isUndefined } from '@app/common/helpers/validation.helpers';
-import { hash } from './helpers/hash.helpers';
-import { formatName } from '@app/common/helpers/string.helpers';
-import { UserDto } from '@app/common/dto/users/user.dto';
-import { Credentials } from '@app/common/entity/credentials.model';
-import dayjs from 'dayjs';
-import { RpcException } from '@nestjs/microservices';
 import { TenantStateService } from '@app/common/core/services/tenant-state.service';
 import { UpdateUserDto } from '@app/common/dto/users/update-user.dto';
+import { UserDto } from '@app/common/dto/users/user.dto';
+import { Credentials } from '@app/common/entity/credentials.model';
+import { User } from '@app/common/entity/user.model';
+import { formatName } from '@app/common/helpers/string.helpers';
+import { isNull, isUndefined } from '@app/common/helpers/validation.helpers';
+import { Injectable, Scope } from '@nestjs/common';
+import { RpcException } from '@nestjs/microservices';
+import { InjectModel } from '@nestjs/sequelize';
+import dayjs from 'dayjs';
+import { Sequelize } from 'sequelize-typescript';
+import { hash } from './helpers/hash.helpers';
 
 @Injectable({ scope: Scope.REQUEST })
 export class UsersService extends BaseService {

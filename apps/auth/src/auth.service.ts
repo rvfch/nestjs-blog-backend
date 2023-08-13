@@ -1,4 +1,22 @@
+import { INVALID_CREDENTIALS } from '@app/common/constants/errors.constants';
+import { TokenType } from '@app/common/constants/token-type.enum';
 import { BaseService } from '@app/common/core/services/base.service';
+import { JwtService } from '@app/common/core/services/jwt.service';
+import { TenantStateService } from '@app/common/core/services/tenant-state.service';
+import { AuthResultDto } from '@app/common/dto/auth/auth-result.dto';
+import { LoginDto } from '@app/common/dto/auth/login.dto';
+import { SignUpDto } from '@app/common/dto/auth/signup.dto';
+import { TenantAuthorizedDto } from '@app/common/dto/auth/tenant-authorized.dto';
+import { UserDto } from '@app/common/dto/users/user.dto';
+import { MessageDto } from '@app/common/dto/utils/message.dto';
+import { Credentials } from '@app/common/entity/credentials.model';
+import { ICredentials } from '@app/common/entity/interface/credentials.interface';
+import { ITenant } from '@app/common/entity/interface/tenant.interface';
+import { IUser } from '@app/common/entity/interface/user.interface';
+import { User } from '@app/common/entity/user.model';
+import { isNull, isUndefined } from '@app/common/helpers/validation.helpers';
+import { IRefreshToken } from '@app/common/interface/auth/token/refresh-token.interface';
+import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import {
   BadRequestException,
   ForbiddenException,
@@ -7,31 +25,13 @@ import {
   Scope,
   UnauthorizedException,
 } from '@nestjs/common';
-import { Observable, firstValueFrom } from 'rxjs';
-import { verify } from 'argon2';
-import { INVALID_CREDENTIALS } from '@app/common/constants/errors.constants';
-import { Sequelize } from 'sequelize-typescript';
-import { User } from '@app/common/entity/user.model';
-import { TokenType } from '@app/common/constants/token-type.enum';
 import { ClientProxy } from '@nestjs/microservices';
-import { IUser } from '@app/common/entity/interface/user.interface';
-import { ITenant } from '@app/common/entity/interface/tenant.interface';
-import { ICredentials } from '@app/common/entity/interface/credentials.interface';
-import dayjs from 'dayjs';
-import { IRefreshToken } from '@app/common/interface/auth/token/refresh-token.interface';
-import { isNull, isUndefined } from '@app/common/helpers/validation.helpers';
-import { CACHE_MANAGER } from '@nestjs/cache-manager';
+import { verify } from 'argon2';
 import { Cache } from 'cache-manager';
+import dayjs from 'dayjs';
+import { Observable, firstValueFrom } from 'rxjs';
+import { Sequelize } from 'sequelize-typescript';
 import { AuthHelper } from './helpers/auth.helpers';
-import { TenantStateService } from '@app/common/core/services/tenant-state.service';
-import { JwtService } from '@app/common/core/services/jwt.service';
-import { Credentials } from '@app/common/entity/credentials.model';
-import { SignUpDto } from '@app/common/dto/auth/signup.dto';
-import { LoginDto } from '@app/common/dto/auth/login.dto';
-import { TenantAuthorizedDto } from '@app/common/dto/auth/tenant-authorized.dto';
-import { MessageDto } from '@app/common/dto/utils/message.dto';
-import { AuthResultDto } from '@app/common/dto/auth/auth-result.dto';
-import { UserDto } from '@app/common/dto/users/user.dto';
 
 @Injectable({ scope: Scope.REQUEST })
 export class AuthService extends BaseService {

@@ -1,3 +1,4 @@
+import { RequestWithUser } from '@app/common/utils/express/request-with-user';
 import {
   BadRequestException,
   Controller,
@@ -8,10 +9,9 @@ import {
   UploadedFile,
   UseInterceptors,
 } from '@nestjs/common';
-import { IFileResponse, UploadService } from './upload.service';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { RequestWithUser } from '@app/common/utils/express/request-with-user';
 import { diskStorage } from 'multer';
+import { IFileResponse, UploadService } from './upload.service';
 
 // @UseGuards(ThrottlerGuard)
 @Controller()

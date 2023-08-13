@@ -1,27 +1,31 @@
+import { BaseController } from '@app/common/core/controllers/base.controller';
+import { CurrentUser } from '@app/common/core/decorators/current-user.decorator';
+import { Origin } from '@app/common/core/decorators/origin.decorator';
+import { Public } from '@app/common/core/decorators/public.decorator';
+import { AuthResultDto } from '@app/common/dto/auth/auth-result.dto';
+import { LoginDto } from '@app/common/dto/auth/login.dto';
+import { SignUpDto } from '@app/common/dto/auth/signup.dto';
+import { TenantAuthorizedDto } from '@app/common/dto/auth/tenant-authorized.dto';
+import { TenantDto } from '@app/common/dto/tenant/tenant.dto';
+import { UserDto } from '@app/common/dto/users/user.dto';
+import { MessageDto } from '@app/common/dto/utils/message.dto';
+import { ITenant } from '@app/common/entity/interface/tenant.interface';
+import { RequestWithTenantId } from '@app/common/utils/express/request-with-tenant';
+import { RequestWithUser } from '@app/common/utils/express/request-with-user';
 import {
   Body,
   Controller,
   Get,
+  HttpCode,
   HttpStatus,
   Inject,
   Post,
-  HttpCode,
   Req,
-  UseGuards,
   Res,
+  UseGuards,
 } from '@nestjs/common';
-import { AuthService } from './auth.service';
-import { ClientProxy } from '@nestjs/microservices';
-import { catchError, of } from 'rxjs';
-import { ITenant } from '@app/common/entity/interface/tenant.interface';
-import { ThrottlerGuard } from '@nestjs/throttler';
-import { Public } from '@app/common/core/decorators/public.decorator';
-import { Origin } from '@app/common/core/decorators/origin.decorator';
-import { RequestWithTenantId } from '@app/common/utils/express/request-with-tenant';
-import { Response } from 'express';
 import { ConfigService } from '@nestjs/config';
-import { RequestWithUser } from '@app/common/utils/express/request-with-user';
-import { CurrentUser } from '@app/common/core/decorators/current-user.decorator';
+import { ClientProxy } from '@nestjs/microservices';
 import {
   ApiBearerAuth,
   ApiBody,
@@ -31,16 +35,11 @@ import {
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
-import { User } from '@app/common/entity/user.model';
+import { ThrottlerGuard } from '@nestjs/throttler';
+import { Response } from 'express';
+import { catchError, of } from 'rxjs';
+import { AuthService } from './auth.service';
 import { AuthHelper } from './helpers/auth.helpers';
-import { BaseController } from '@app/common/core/controllers/base.controller';
-import { SignUpDto } from '@app/common/dto/auth/signup.dto';
-import { LoginDto } from '@app/common/dto/auth/login.dto';
-import { TenantDto } from '@app/common/dto/tenant/tenant.dto';
-import { TenantAuthorizedDto } from '@app/common/dto/auth/tenant-authorized.dto';
-import { MessageDto } from '@app/common/dto/utils/message.dto';
-import { AuthResultDto } from '@app/common/dto/auth/auth-result.dto';
-import { UserDto } from '@app/common/dto/users/user.dto';
 
 @ApiTags('Authentication')
 @Controller('auth')
