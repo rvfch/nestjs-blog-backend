@@ -4,11 +4,8 @@ import { Public } from '@app/common/core/decorators/public.decorator';
 import { AllExceptionsFilter } from '@app/common/core/exceptions/exception.filter';
 import { AuthGuard } from '@app/common/core/guards/auth.guard';
 import { ArticleDto } from '@app/common/dto/blog/article/article.dto';
-import { PublishArticleDto } from '@app/common/dto/blog/article/publish-article.dto';
-import { RemoveArticleDto } from '@app/common/dto/blog/article/remove-article.dto';
 import { UpdateArticleDto } from '@app/common/dto/blog/article/update-article.dto';
 import { MessageDto } from '@app/common/dto/utils/message.dto';
-import { RequestWithTenantId } from '@app/common/utils/express/request-with-tenant';
 import { CacheInterceptor } from '@nestjs/cache-manager';
 import {
   Body,
@@ -21,7 +18,6 @@ import {
   Patch,
   Post,
   Query,
-  Req,
   UseFilters,
   UseGuards,
   UseInterceptors,
@@ -48,11 +44,10 @@ export class ArticleController extends BaseController {
 
   /**
    * Creates a new article
-   * @param {RequestWithTenantId} req - The request object.
    * @param {string} userId - The ID of the current user.
    * @param {CreateArticleDto} dtoIn - The DTO with data to create the article.
    */
-  @Post('create')
+  @Post()
   @HttpCode(HttpStatus.CREATED)
   @ApiOperation({ summary: 'Create an article' })
   @ApiResponse({
@@ -62,7 +57,6 @@ export class ArticleController extends BaseController {
   @ApiResponse({ status: 400, description: 'Bad Request' })
   @ApiBearerAuth()
   public async create(
-    @Req() req: RequestWithTenantId,
     @CurrentUser() userId: string,
     @Body() dtoIn: CreateArticleDto,
   ): Promise<ArticleDto> {
@@ -70,53 +64,28 @@ export class ArticleController extends BaseController {
   }
 
   /**
-   * Retrieves all articles.
-   * @param {ArticleDtoIn} dtoIn - The DTO with filters for retrieving articles.
-   * @param {RequestWithTenantId} req - The request object.
+   * Retrieves all articles or user's articles if the query param mine is true.
+   * @param {PageDto} dtoIn - The DTO with filters for retrieving articles.
    */
   @UseInterceptors(CacheInterceptor)
   @Public()
-  @Get('all')
+  @Get()
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Retrieve all articles' })
   @ApiResponse({ status: 200, description: 'List of all articles.' })
   @ApiResponse({ status: 400, description: 'Bad Request' })
   @ApiBearerAuth()
   public async findAll(
-    @Query() query: { page: number; pageSize: number },
-    @Req() req: RequestWithTenantId,
+    @Query() query: { page: number; pageSize: number; mine?: boolean },
+    @CurrentUser() userId?: string,
   ): Promise<ArticleDto[]> {
+    if (query.mine) return await this.articleService.findAll(query, userId);
     return await this.articleService.findAll(query);
-  }
-
-  /**
-   * Retrieves all articles of the current user.
-   * @param {ArticleDtoIn} dtoIn - The DTO with filters for retrieving articles.
-   * @param {string} userId - The ID of the current user.
-   * @param {RequestWithTenantId} req - The request object.
-   */
-  @UseInterceptors(CacheInterceptor)
-  @Get('myArticles')
-  @HttpCode(HttpStatus.OK)
-  @ApiOperation({ summary: 'Retrieve current user articles' })
-  @ApiResponse({
-    status: 200,
-    description: 'List of all articles of the current user.',
-  })
-  @ApiResponse({ status: 400, description: 'Bad Request' })
-  @ApiBearerAuth()
-  public async myArticles(
-    @Query() query: { page: number; pageSize: number },
-    @CurrentUser() userId: string,
-    @Req() req: RequestWithTenantId,
-  ): Promise<ArticleDto[]> {
-    return await this.articleService.findAll(query, userId);
   }
 
   /**
    * Retrieves an article by its id.
    * @param {string} id - The ID of the article.
-   * @param {RequestWithTenantId} req - The request object.
    */
   @Get(':id')
   @Public()
@@ -125,20 +94,16 @@ export class ArticleController extends BaseController {
   @ApiResponse({ status: 200, description: 'Return the article.' })
   @ApiResponse({ status: 400, description: 'Bad Request' })
   @ApiBearerAuth()
-  public async findOne(
-    @Param('id') id: string,
-    @Req() req: RequestWithTenantId,
-  ): Promise<ArticleDto> {
+  public async findOne(@Param('id') id: string): Promise<ArticleDto> {
     return await this.articleService.findOne(id);
   }
 
   /**
    * Publish article
-   * @param {RequestWithTenantId} req - The request object.
    * @param {string} userId - The ID of the current user.
-   * @param {CreateArticleDto} dtoIn - The DTO with data to create the article.
+   * @param {string} id - Article ID to publish
    */
-  @Post('publish')
+  @Post(':id/publish')
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Publish an article' })
   @ApiResponse({
@@ -147,18 +112,14 @@ export class ArticleController extends BaseController {
   })
   @ApiResponse({ status: 400, description: 'Bad Request' })
   @ApiBearerAuth()
-  public async publish(
-    @Req() req: RequestWithTenantId,
-    @CurrentUser() userId: string,
-    @Body() dtoIn: PublishArticleDto,
-  ) {
-    return await this.articleService.publish(dtoIn, userId);
+  public async publish(@Param('id') id: string, @CurrentUser() userId: string) {
+    return await this.articleService.publish(id, userId);
   }
 
   /**
    * Updates an article.
+   * @param {string} id - Article ID to update
    * @param {UpdateArticleDto} dtoIn - The DTO with data to update the article.
-   * @param {RequestWithTenantId} req - The request object.
    * @param {string} userId - The ID of the current user.
    */
   @Patch(':id')
@@ -171,20 +132,19 @@ export class ArticleController extends BaseController {
   @ApiResponse({ status: 400, description: 'Bad Request' })
   @ApiBearerAuth()
   public async update(
+    @Param('id') id: string,
     @Body() dtoIn: UpdateArticleDto,
-    @Req() req: RequestWithTenantId,
     @CurrentUser() userId: string,
   ): Promise<ArticleDto> {
-    return await this.articleService.update(dtoIn, userId);
+    return await this.articleService.update({ ...dtoIn, id }, userId);
   }
 
   /**
    * Deletes an article.
-   * @param {RequestWithTenantId} req - The request object.
-   * @param {RemoveArticleDto} dtoIn - The DTO with data to delete the article.
+   * @param {string} id - Article ID to remove
    * @param {string} userId - The ID of the current user.
    */
-  @Delete('/remove')
+  @Delete(':id')
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Delete an article' })
   @ApiResponse({
@@ -194,10 +154,9 @@ export class ArticleController extends BaseController {
   @ApiResponse({ status: 400, description: 'Bad Request' })
   @ApiBearerAuth()
   public async remove(
-    @Req() req: RequestWithTenantId,
-    @Body() dtoIn: RemoveArticleDto,
+    @Param('id') id: string,
     @CurrentUser() userId: string,
   ): Promise<MessageDto> {
-    return await this.articleService.remove(dtoIn, userId);
+    return await this.articleService.remove(id, userId);
   }
 }

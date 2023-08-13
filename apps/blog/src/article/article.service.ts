@@ -13,13 +13,16 @@ import { User } from '@app/common/entity/user.model';
 import { BaseService } from '@app/common/core/services/base.service';
 import { TenantStateService } from '@app/common/core/services/tenant-state.service';
 
+import { GET_USER_BY_ID } from '@app/common/constants/constants';
 import { ArticleDto } from '@app/common/dto/blog/article/article.dto';
 import { CreateArticleDto } from '@app/common/dto/blog/article/create-article.dto';
-import { PublishArticleDto } from '@app/common/dto/blog/article/publish-article.dto';
-import { RemoveArticleDto } from '@app/common/dto/blog/article/remove-article.dto';
 import { UpdateArticleDto } from '@app/common/dto/blog/article/update-article.dto';
 import { MessageDto } from '@app/common/dto/utils/message.dto';
 import { PageDto } from '@app/common/dto/utils/page.dto';
+import {
+  ARTICLE_NOT_FOUND,
+  ARTICLE_REMOVED_MESSAGE,
+} from './article.constants';
 
 @Injectable({ scope: Scope.REQUEST })
 export class ArticleService extends BaseService {
@@ -69,7 +72,7 @@ export class ArticleService extends BaseService {
   }
 
   private async getUserById(id: string): Promise<User> {
-    return await this.getData<User>('get_user_by_id', id);
+    return await this.getData<User>(GET_USER_BY_ID, id);
   }
 
   /**
@@ -122,7 +125,7 @@ export class ArticleService extends BaseService {
     return articles.map((article: IArticle) => new ArticleDto(article));
   }
 
-  public async publish({ id }: PublishArticleDto, userId: string) {
+  public async publish(id: string, userId: string) {
     // 1. Validate ownership and get article
     const article: Article = await this.validateOwnershipOfArticle(
       id,
@@ -236,20 +239,15 @@ export class ArticleService extends BaseService {
    * @param {string} userId - The ID of the user removing the article.
    * @returns {Promise<MessageDto>} - A message indicating the removal of the article.
    */
-  public async remove(
-    dtoIn: RemoveArticleDto,
-    userId: string,
-  ): Promise<MessageDto> {
-    // 1. Extract the article ID from the DTO
-    const articleId = dtoIn.id;
-    // 2. Validate that the user owns the article
-    await this.validateOwnershipOfArticle(articleId, userId);
-    // 3. Remove the article
+  public async remove(id: string, userId: string): Promise<MessageDto> {
+    // 1. Validate that the user owns the article
+    await this.validateOwnershipOfArticle(id, userId);
+    // 2. Remove the article
     await this.articleRepository
       .schema(this.getTenantId())
-      .destroy({ where: { id: articleId } });
-    // 4. Return a success message
-    return this.generateMessage(`Article ${articleId} removed`);
+      .destroy({ where: { id } });
+    // 3. Return a success message
+    return this.generateMessage(ARTICLE_REMOVED_MESSAGE(id));
   }
   /**
    * Provides pagination based on the page number and size.
@@ -316,7 +314,7 @@ export class ArticleService extends BaseService {
         .findOne({ where: { articleId: id } });
     }
     if (numberOfAffectedRows === 0) {
-      throw new NotFoundException(`Article with ID ${id} not found`);
+      throw new NotFoundException(ARTICLE_NOT_FOUND(id));
     }
     return updatedArticle;
   }

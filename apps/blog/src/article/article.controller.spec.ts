@@ -2,14 +2,11 @@ import { JwtService } from '@app/common/core/services/jwt.service';
 import { TenantStateService } from '@app/common/core/services/tenant-state.service';
 import { ArticleDto } from '@app/common/dto/blog/article/article.dto';
 import { UserDto } from '@app/common/dto/users/user.dto';
-import { MessageDto } from '@app/common/dto/utils/message.dto';
 import { ArticleImage } from '@app/common/entity/article-image.model';
 import { Article } from '@app/common/entity/article.model';
 import { ArticleStatus } from '@app/common/entity/enums/articlestatus.enum';
 import {
-  generateRandomUUID4,
   getMockArticles,
-  mockRequestWithTenantId,
   mockSequelize,
   mockUser,
 } from '@app/common/helpers/test.helpers';
@@ -19,6 +16,7 @@ import { getModelToken } from '@nestjs/sequelize';
 import { Test } from '@nestjs/testing';
 import { ThrottlerStorage } from '@nestjs/throttler';
 import { MockFunctionMetadata, ModuleMocker } from 'jest-mock';
+import { ARTICLE_REMOVED_MESSAGE } from './article.constants';
 import { ArticleController } from './article.controller';
 import { ArticleService } from './article.service';
 
@@ -41,11 +39,6 @@ const updatedArticle: ArticleDto = {
   content: 'Updated content',
   perex: 'Updated perex',
 };
-
-const removeArticleMsg = (articleId: string): MessageDto => ({
-  message: `Article ${articleId} removed`,
-  id: generateRandomUUID4(),
-});
 
 describe('ArticleController', () => {
   let controller: ArticleController;
@@ -98,7 +91,7 @@ describe('ArticleController', () => {
             findOne: jest.fn().mockResolvedValue(article),
             publish: jest.fn().mockResolvedValue(publishedArticle),
             update: jest.fn().mockResolvedValue(updatedArticle),
-            remove: jest.fn().mockResolvedValue(removeArticleMsg),
+            remove: jest.fn(),
           };
         }
         if (typeof token === 'function') {
@@ -131,50 +124,38 @@ describe('ArticleController', () => {
     it('should return an array of articles', async () => {
       const query = { page: 1, pageSize: 10 };
       jest.spyOn(service, 'findAll').mockResolvedValue(articles);
-      expect(await controller.findAll(query, mockRequestWithTenantId())).toBe(
-        articles,
-      );
+      expect(await controller.findAll(query)).toBe(articles);
     });
 
     it('should successfully create an article', async () => {
       jest.spyOn(service, 'create').mockResolvedValue(article);
-      expect(
-        await controller.create(mockRequestWithTenantId(), user.id, article),
-      ).toBe(article);
+      expect(await controller.create(user.id, article)).toBe(article);
     });
 
     it('should return articles for the current user', async () => {
-      const query = { page: 1, pageSize: 10 };
+      const query = { page: 1, pageSize: 10, mine: true };
       jest.spyOn(service, 'findAll').mockResolvedValue(articles);
-      expect(
-        await controller.myArticles(query, user.id, mockRequestWithTenantId()),
-      ).toBe(articles);
+      expect(await controller.findAll(query, user.id)).toBe(articles);
     });
 
     it('should return article with status published', async () => {
       jest.spyOn(service, 'publish').mockResolvedValue(publishedArticle);
-      expect(
-        await controller.publish(mockRequestWithTenantId(), user.id, article),
-      ).toBe(publishedArticle);
+      expect(await controller.publish(article.id, user.id)).toBe(
+        publishedArticle,
+      );
     });
 
     it('should return the updated article', async () => {
       jest.spyOn(service, 'update').mockResolvedValue(updatedArticle);
       expect(
-        await controller.update(
-          updatedArticle,
-          mockRequestWithTenantId(),
-          user.id,
-        ),
+        await controller.update(updatedArticle.id, updatedArticle, user.id),
       ).toBe(updatedArticle);
     });
 
     it('should return a message after removing an article', async () => {
-      const result = removeArticleMsg(article.id);
+      const result = { message: ARTICLE_REMOVED_MESSAGE(article.id), id: '' };
       jest.spyOn(service, 'remove').mockResolvedValue(result);
-      expect(
-        await controller.remove(mockRequestWithTenantId(), article, user.id),
-      ).toBe(result);
+      expect(await controller.remove(article.id, user.id)).toBe(result);
     });
   });
 });

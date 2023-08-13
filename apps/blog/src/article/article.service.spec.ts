@@ -3,7 +3,6 @@ import { TenantStateService } from '@app/common/core/services/tenant-state.servi
 import { ArticleDto } from '@app/common/dto/blog/article/article.dto';
 import { CreateArticleDto } from '@app/common/dto/blog/article/create-article.dto';
 import { UserDto } from '@app/common/dto/users/user.dto';
-import { MessageDto } from '@app/common/dto/utils/message.dto';
 import { ArticleImage } from '@app/common/entity/article-image.model';
 import { Article } from '@app/common/entity/article.model';
 import { BlacklistedToken } from '@app/common/entity/blacklisted-token.model';
@@ -26,6 +25,7 @@ import { getModelToken } from '@nestjs/sequelize';
 import { Test, TestingModule } from '@nestjs/testing';
 import { ThrottlerStorage } from '@nestjs/throttler';
 import { Sequelize } from 'sequelize-typescript';
+import { ARTICLE_REMOVED_MESSAGE } from './article.constants';
 import { ArticleService } from './article.service';
 
 describe('ArticleService', () => {
@@ -54,10 +54,6 @@ describe('ArticleService', () => {
     imageUrl: expect.any(String),
     id: expect.any(String),
   };
-  const removeArticleMsg = (articleId: string): MessageDto => ({
-    message: `Article ${articleId} removed`,
-    id: expect.any(String),
-  });
 
   beforeEach(async () => {
     const moduleRef: TestingModule = await Test.createTestingModule({
@@ -224,8 +220,8 @@ describe('ArticleService', () => {
     it('HDS should remove and return a message', async () => {
       jest.spyOn(articleModel, 'findOne').mockResolvedValue(article as Article);
       jest.spyOn(articleModel, 'destroy').mockResolvedValue(1);
-      const result = await service.remove(article, user.id);
-      expect(result).toEqual(removeArticleMsg(article.id));
+      const result = await service.remove(article.id, user.id);
+      expect(result).toEqual(ARTICLE_REMOVED_MESSAGE(article.id));
     });
   });
 
@@ -238,7 +234,7 @@ describe('ArticleService', () => {
       jest
         .spyOn(articleModel, 'findOne')
         .mockResolvedValue(mockArticleInstance as any);
-      const result = await service.publish(publishedArticle, user.id);
+      const result = await service.publish(publishedArticle.id, user.id);
       expect(result).toEqual(publishedArticle);
     });
   });
