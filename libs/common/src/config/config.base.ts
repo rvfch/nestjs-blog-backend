@@ -6,10 +6,12 @@ export const configBase = {
   port: parseInt(process.env.PORT, 10),
   debug: process.env.NODE_ENV === 'development',
   redis: {
-    host: process.env.REDIS_HOST,
-    port: parseInt(process.env.REDIS_PORT),
-    url: process.env.REDIS_URL,
-    ttl: parseInt(process.env.REDIS_TTL, 10),
+    host: process.env.REDIS_HOST || 'redis-server',
+    port: parseInt(process.env.REDIS_PORT) || 6379,
+    url: `redis://${process.env.REDIS_HOST || 'redis-server'}:${
+      process.env.REDIS_PORT || 6379
+    }`,
+    ttl: parseInt(process.env.REDIS_TTL, 10) || 60,
   },
   throttler: {
     ttl: parseInt(process.env.THROTTLE_TTL, 10),

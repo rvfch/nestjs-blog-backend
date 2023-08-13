@@ -32,11 +32,11 @@ import { ThrottlerGuard } from '@nestjs/throttler';
 import { CreateArticleDto } from '../../../../libs/common/src/dto/blog/article/create-article.dto';
 import { ArticleService } from './article.service';
 
-@ApiTags('article')
+@ApiTags('articles')
 @UseGuards(ThrottlerGuard)
 @UseGuards(AuthGuard)
 @UseFilters(AllExceptionsFilter)
-@Controller('article')
+@Controller('articles')
 export class ArticleController extends BaseController {
   constructor(private readonly articleService: ArticleService) {
     super(articleService);

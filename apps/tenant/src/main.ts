@@ -1,3 +1,4 @@
+import { REDIS_HOST, REDIS_PORT } from '@app/common/constants/constants';
 import { ValidationPipe } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { NestFactory } from '@nestjs/core';
@@ -8,17 +9,14 @@ async function bootstrap() {
   const appContext = await NestFactory.createApplicationContext(TenantModule);
   const configService = appContext.get(ConfigService);
 
-  const redisHost = configService.get<string>('redis.host');
-  const redisPort = configService.get<number>('redis.port');
-
   // Setup redis microservice
   const app = await NestFactory.createMicroservice<MicroserviceOptions>(
     TenantModule,
     {
       transport: Transport.REDIS,
       options: {
-        host: redisHost,
-        port: redisPort,
+        host: configService.get<string>(REDIS_HOST),
+        port: configService.get<number>(REDIS_PORT),
       },
     },
   );

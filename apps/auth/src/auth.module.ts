@@ -1,6 +1,7 @@
 import { RedisModule } from '@app/common';
 import { CacheConfig } from '@app/common/config/cache.config';
 import { ThrottlerConfig } from '@app/common/config/throttler.config';
+import { REDIS_HOST, REDIS_PORT } from '@app/common/constants/constants';
 import { AuthGuard } from '@app/common/core/guards/auth.guard';
 import { TenantMiddleware } from '@app/common/core/middleware/tenant.middleware';
 import { JwtService } from '@app/common/core/services/jwt.service';
@@ -47,8 +48,8 @@ import { configValidation } from './config/schema/app.config.schema';
         return ClientProxyFactory.create({
           transport: Transport.REDIS,
           options: {
-            host: configService.get<string>('redis.host'),
-            port: configService.get<number>('redis.port'),
+            host: configService.get<string>(REDIS_HOST),
+            port: configService.get<number>(REDIS_PORT),
           },
         });
       },

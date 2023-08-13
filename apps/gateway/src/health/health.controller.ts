@@ -1,3 +1,4 @@
+import { REDIS_HOST, REDIS_PORT } from '@app/common/constants/constants';
 import { Controller, Get } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { Transport } from '@nestjs/microservices';
@@ -47,16 +48,16 @@ export class HealthController {
         this.ms.pingCheck('tenant', {
           transport: Transport.REDIS,
           options: {
-            host: this.configService.get('redis.host') || 'redis-server',
-            port: this.configService.get('redis.port') || 6379,
+            host: this.configService.get(REDIS_HOST),
+            port: this.configService.get(REDIS_PORT),
           },
         }),
       async () =>
         this.ms.pingCheck('users', {
           transport: Transport.REDIS,
           options: {
-            host: this.configService.get('redisHost') || 'redis-server',
-            port: this.configService.get('redisPort') || 6379,
+            host: this.configService.get(REDIS_HOST),
+            port: this.configService.get(REDIS_PORT),
           },
         }),
     ]);

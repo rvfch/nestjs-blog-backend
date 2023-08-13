@@ -32,7 +32,7 @@ export class CommentDto implements Partial<IComment> {
   ratingScore: number;
 
   @Field({ defaultValue: true })
-  canVote = true;
+  canVote: boolean;
 
   @Field({ nullable: true })
   @IsUUID(4)

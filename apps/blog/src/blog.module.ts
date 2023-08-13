@@ -1,10 +1,10 @@
-import { RedisModule } from '@app/common';
 import { CacheConfig } from '@app/common/config/cache.config';
 import { ThrottlerConfig } from '@app/common/config/throttler.config';
 import { TenantMiddleware } from '@app/common/core/middleware/tenant.middleware';
 import { JwtModule } from '@app/common/core/services/jwt.module';
 import { TenantStateService } from '@app/common/core/services/tenant-state.service';
 import { DatabaseModule } from '@app/common/database/database.module';
+import { RedisModule } from '@app/common/redis/redis.module';
 import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
 import { CacheModule } from '@nestjs/cache-manager';
 import { MiddlewareConsumer, Module, RequestMethod } from '@nestjs/common';
@@ -25,6 +25,8 @@ import { configValidation } from './config/app.config.schema';
       validationSchema: configValidation,
       load: [config],
     }),
+    RedisModule,
+    DatabaseModule,
     ThrottlerModule.forRootAsync({
       imports: [ConfigModule],
       useClass: ThrottlerConfig,
@@ -38,7 +40,6 @@ import { configValidation } from './config/app.config.schema';
       driver: ApolloDriver,
       useFactory: async () => ({
         context: ({ req }) => {
-          console.log(req);
           return req;
         },
         autoSchemaFile: true,
@@ -62,8 +63,6 @@ import { configValidation } from './config/app.config.schema';
         playground: true,
       }),
     }),
-    RedisModule,
-    DatabaseModule,
     ArticleModule,
     CommentModule,
     JwtModule,

@@ -1,3 +1,4 @@
+import { REDIS_HOST, REDIS_PORT } from '@app/common/constants/constants';
 import { TenantMiddleware } from '@app/common/core/middleware/tenant.middleware';
 import { JwtModule } from '@app/common/core/services/jwt.module';
 import { TenantStateService } from '@app/common/core/services/tenant-state.service';
@@ -22,8 +23,8 @@ import { ArticleService } from './article.service';
         return ClientProxyFactory.create({
           transport: Transport.REDIS,
           options: {
-            host: configService.get<string>('redis.host'),
-            port: configService.get<number>('redis.port'),
+            host: configService.get<string>(REDIS_HOST),
+            port: configService.get<number>(REDIS_PORT),
           },
         });
       },
